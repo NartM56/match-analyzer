@@ -1,1 +1,6 @@
 open-data/
+data-sample/
+node_modules/
+venv/
+__pycache__/
+.env
