@@ -116,13 +116,6 @@
   gap: 6px;
 }
 
-.skeleton-bar {
-  display: block;
-  border-radius: 999px;
-  background: var(--color-neutral-300);
-  animation: piqPulse 1.4s ease-in-out infinite;
-}
-
 /* error and empty states */
 .comp-pane__alert {
   display: flex;
@@ -459,10 +452,14 @@
   gap: 12px;
   padding: 10px 14px;
   border-radius: 22px;
+  /* the row is a link: show it as normal text, not a blue/terracotta underlined link */
+  color: inherit;
+  text-decoration: none;
 }
 
 .match-row:hover {
   background: var(--color-bg);
+  color: inherit; /* overrides the global a:hover colour in index.css */
 }
 
 .match-row__when {

@@ -30,6 +30,14 @@ ul {
   }
 }
 
+/* Loading placeholder bar, shared by every page */
+.skeleton-bar {
+  display: block;
+  border-radius: 999px;
+  background: var(--color-neutral-300);
+  animation: piqPulse 1.4s ease-in-out infinite;
+}
+
 /* Centred page column shared by the header and every page */
 .page-width {
   width: 100%;

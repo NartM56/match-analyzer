@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import type { Competition, Season, Match } from "../types/api";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { Link } from "react-router-dom";
+import { formatDate, teamCode } from "../utils/format";
 import "./MatchSelection.css";
 
 type Status = "loading" | "ready" | "error";
@@ -40,7 +42,10 @@ async function fetchSeasons(competitionId: number): Promise<Season[]> {
   }
 }
 
-async function fetchMatches(competitionId: number, seasonId: number): Promise<Match[]> {
+async function fetchMatches(
+  competitionId: number,
+  seasonId: number,
+): Promise<Match[]> {
   try {
     const response = await fetch(
       `/api/competitions/${competitionId}/seasons/${seasonId}/matches`,
@@ -66,39 +71,6 @@ type MatchSection = {
   rows: Match[];
 };
 
-// "2022-11-20" -> "Sun 20 Nov". The "T00:00" makes it local midnight; without it the
-// date is read as UTC and shows the previous day in North American time zones.
-function formatDate(isoDate: string) {
-  return new Date(`${isoDate}T00:00`).toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-}
-
-// Official FIFA codes. StatsBomb has no team codes, and guessing them from the name gives
-// wrong (and sometimes offensive) results, so known teams are looked up here.
-const TEAM_CODES: Record<string, string> = {
-  Argentina: "ARG", Australia: "AUS", Belgium: "BEL", Brazil: "BRA", Cameroon: "CMR",
-  Canada: "CAN", "Costa Rica": "CRC", Croatia: "CRO", Denmark: "DEN", Ecuador: "ECU",
-  England: "ENG", France: "FRA", Germany: "GER", Ghana: "GHA", Iran: "IRN", Japan: "JPN",
-  Mexico: "MEX", Morocco: "MAR", Netherlands: "NED", Poland: "POL", Portugal: "POR",
-  Qatar: "QAT", "Saudi Arabia": "KSA", Senegal: "SEN", Serbia: "SRB", "South Korea": "KOR",
-  Spain: "ESP", Switzerland: "SUI", Tunisia: "TUN", "United States": "USA", Uruguay: "URU",
-  Wales: "WAL",
-};
-
-// Unknown teams fall back to their words' first letters ("Real Madrid" -> "RM"),
-// or the first two letters of a one-word name.
-function teamCode(teamName: string) {
-  const known = TEAM_CODES[teamName];
-  if (known) return known;
-  const words = teamName.split(/\s+/).filter(Boolean);
-  return words.length > 1
-    ? words.map((w) => w[0]).join("").slice(0, 3).toUpperCase()
-    : teamName.slice(0, 2).toUpperCase();
-}
-
 function winner(m: Match): "home" | "away" | null {
   if (m.home_team_score > m.away_team_score) return "home";
   if (m.away_team_score > m.home_team_score) return "away";
@@ -111,7 +83,9 @@ function kickOffKey(m: Match) {
 }
 
 function sortMatches(list: Match[], order: SortOrder) {
-  const sorted = [...list].sort((a, b) => kickOffKey(a).localeCompare(kickOffKey(b)));
+  const sorted = [...list].sort((a, b) =>
+    kickOffKey(a).localeCompare(kickOffKey(b)),
+  );
   return order === "asc" ? sorted : sorted.reverse();
 }
 
@@ -120,12 +94,17 @@ function buildSections(list: Match[]): MatchSection[] {
   const sections: MatchSection[] = [];
   for (const m of list) {
     const isGroup = m.competition_stage === "Group Stage";
-    const title = isGroup ? "Group stage" : m.competition_stage ?? "Matches";
+    const title = isGroup ? "Group stage" : (m.competition_stage ?? "Matches");
     const key = isGroup ? `${title} · ${m.match_week}` : title;
 
     let section = sections.find((s) => s.key === key);
     if (!section) {
-      section = { key, title, sub: isGroup ? `Matchday ${m.match_week}` : "", rows: [] };
+      section = {
+        key,
+        title,
+        sub: isGroup ? `Matchday ${m.match_week}` : "",
+        rows: [],
+      };
       sections.push(section);
     }
     section.rows.push(m);
@@ -262,7 +241,9 @@ export function MatchSelection() {
   // stage chips come from the data, in the order the stages were played
   const stages = [
     "All",
-    ...new Set(sortMatches(matches, "asc").map((m) => m.competition_stage ?? "Other")),
+    ...new Set(
+      sortMatches(matches, "asc").map((m) => m.competition_stage ?? "Other"),
+    ),
   ];
   const sections = buildSections(sortMatches(shownMatches, sortOrder));
   const isFiltered = shownMatches.length !== matches.length;
@@ -505,7 +486,11 @@ export function MatchSelection() {
                       ? `${shownMatches.length} of ${countLabel(matches.length)}`
                       : countLabel(matches.length)}
                   </span>
-                  <div className="seg" role="radiogroup" aria-label="Sort order">
+                  <div
+                    className="seg"
+                    role="radiogroup"
+                    aria-label="Sort order"
+                  >
                     {(
                       [
                         ["desc", "Latest first"],
@@ -525,7 +510,11 @@ export function MatchSelection() {
                   </div>
                 </div>
 
-                <div className="pill-row" role="group" aria-label="Filter by stage">
+                <div
+                  className="pill-row"
+                  role="group"
+                  aria-label="Filter by stage"
+                >
                   {stages.map((s) => (
                     <button
                       key={s}
@@ -544,7 +533,9 @@ export function MatchSelection() {
             {matches.length > 0 && shownMatches.length === 0 && (
               <div className="match-empty">
                 <h4>
-                  {matchQuery ? `No matches for “${searchMatch}”` : "No matches in this stage"}
+                  {matchQuery
+                    ? `No matches for “${searchMatch}”`
+                    : "No matches in this stage"}
                 </h4>
                 <p>Try another team name, or widen the stage filter.</p>
                 <button
@@ -573,13 +564,23 @@ export function MatchSelection() {
                   {section.rows.map((m) => {
                     const won = winner(m);
                     return (
-                      <li key={m.id} className="match-row">
+                      <Link
+                        key={m.id}
+                        className="match-row"
+                        to={`/matches/${m.id}`}
+                      >
                         <span className="match-row__when">
-                          <span className="match-row__date">{formatDate(m.match_date)}</span>
-                          <span className="match-row__time">{m.kick_off?.slice(0, 5)}</span>
+                          <span className="match-row__date">
+                            {formatDate(m.match_date)}
+                          </span>
+                          <span className="match-row__time">
+                            {m.kick_off?.slice(0, 5)}
+                          </span>
                         </span>
                         <span className="match-row__team match-row__team--home">
-                          <span className={`match-row__name${won === "home" ? " is-winner" : ""}`}>
+                          <span
+                            className={`match-row__name${won === "home" ? " is-winner" : ""}`}
+                          >
                             {m.home_team_name}
                           </span>
                           <span className="team-badge" aria-hidden="true">
@@ -593,19 +594,23 @@ export function MatchSelection() {
                           <span className="team-badge" aria-hidden="true">
                             {teamCode(m.away_team_name)}
                           </span>
-                          <span className={`match-row__name${won === "away" ? " is-winner" : ""}`}>
+                          <span
+                            className={`match-row__name${won === "away" ? " is-winner" : ""}`}
+                          >
                             {m.away_team_name}
                           </span>
                         </span>
                         <span className="match-row__tag">
                           {m.group_name && (
-                            <span className="tag tag-neutral">Group {m.group_name}</span>
+                            <span className="tag tag-neutral">
+                              Group {m.group_name}
+                            </span>
                           )}
                         </span>
                         <span className="match-row__chevron" aria-hidden="true">
                           <ChevronIcon direction="right" />
                         </span>
-                      </li>
+                      </Link>
                     );
                   })}
                 </ul>

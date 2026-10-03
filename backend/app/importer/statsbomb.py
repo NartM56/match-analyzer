@@ -156,6 +156,7 @@ def import_lineups(session, match_id, events):
             player_obj = Player(
                 id = player_id,
                 name = player_name,
+                nickname = player.get("player_nickname"),
                 country = player_country
             )
             session.merge(player_obj)

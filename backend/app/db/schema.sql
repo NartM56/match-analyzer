@@ -25,7 +25,8 @@ CREATE TABLE teams (
 
 CREATE TABLE players (
     id INT PRIMARY KEY,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL,                      -- full legal name, e.g. "Lionel Andrés Messi Cuccittini"
+    nickname TEXT,                           -- common name, e.g. "Lionel Messi" (missing for ~60% of players)
     country TEXT
 );
 

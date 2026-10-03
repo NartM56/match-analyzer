@@ -58,6 +58,7 @@ class Player(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
     name: Mapped[str] = mapped_column(Text, nullable=False)
+    nickname: Mapped[Optional[str]] = mapped_column(Text)  # show this when present
     country: Mapped[Optional[str]] = mapped_column(Text)
 
 

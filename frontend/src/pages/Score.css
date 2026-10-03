@@ -1,0 +1,259 @@
+/* Match page shell: back link, score header and tabs shared by every match tab.
+   Values follow the "Match Analysis" prototype; colours come from the Organic tokens. */
+
+.match-page {
+  padding-bottom: 72px;
+}
+
+/* — back link — */
+.match-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* — score header — */
+.match-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-top: 16px;
+  padding-bottom: 24px;
+  text-align: center;
+}
+
+.match-head--loading .skeleton-bar {
+  margin-inline: auto;
+}
+
+.match-head__kicker {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+}
+
+/* home | score | away — the 1fr columns keep the score centred whatever the name lengths */
+.match-head__teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 820px;
+}
+
+.match-head__team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.match-head__team--home {
+  justify-content: flex-end;
+}
+
+.match-head__name {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.match-head__badge {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.match-head__badge--home {
+  background: var(--color-accent-200);
+  color: var(--color-accent-900);
+}
+
+.match-head__badge--away {
+  background: var(--color-accent-2-200);
+  color: var(--color-accent-2-900);
+}
+
+.match-head__score {
+  font-family: var(--font-heading);
+  font-size: 64px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.match-head__tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.match-head__tags .tag {
+  font-size: 12px;
+}
+
+.match-head__pens {
+  font-weight: 600;
+}
+
+/* scorers line up under their team; the small ring marks the centre */
+.match-head__scorers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 28px;
+  width: 100%;
+  max-width: 820px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-neutral-800);
+}
+
+.match-head__scorers-home,
+.match-head__scorers-away {
+  display: flex;
+  flex-direction: column;
+}
+
+.match-head__scorers-home {
+  text-align: right;
+}
+
+.match-head__scorers-away {
+  text-align: left;
+}
+
+.match-head__ball {
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  border: 2px solid var(--color-neutral-600);
+}
+
+/* — tabs: a pill bar that sticks to the top while scrolling — */
+.match-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 10px 40px;
+  background: var(--color-bg);
+}
+
+.match-tabs__list {
+  display: flex;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 5px;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border-radius: 999px;
+}
+
+.match-tabs__tab {
+  flex: none;
+  padding: 9px 18px;
+  border-radius: 999px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.match-tabs__tab:hover {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+
+.match-tabs__tab.is-active {
+  background: var(--color-accent-700); /* 700, not the base accent, so the small text passes contrast */
+  color: var(--color-bg);
+}
+
+.match-page__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: 8px;
+}
+
+/* — error / not found — */
+.match-page__alert {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 24px;
+  padding: var(--space-6);
+  background: var(--color-accent-100);
+  color: var(--color-accent-900);
+  border-radius: 32px;
+}
+
+.match-page__alert h4,
+.match-page__alert p {
+  margin: 0;
+}
+
+.match-page__alert p {
+  font-size: 14px;
+}
+
+.match-page__alert .btn-primary {
+  color: var(--color-bg);
+  text-decoration: none;
+}
+
+/* — phones: stack badge over name, shrink the score — */
+@media (max-width: 759px) {
+  .match-head__teams,
+  .match-head__scorers {
+    gap: 14px;
+  }
+
+  .match-head__team--home {
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .match-head__team--away {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .match-head__name {
+    font-size: 18px;
+  }
+
+  .match-head__badge {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
+  }
+
+  .match-head__score {
+    font-size: 40px;
+  }
+
+  .match-head__scorers {
+    font-size: 12px;
+  }
+
+  .match-tabs {
+    padding-inline: 18px;
+  }
+}
