@@ -1,0 +1,590 @@
+/* Match picker page, from the "Match Picker" design.
+   Built on the Organic design system classes (.input, .seg, .tag, .btn). */
+
+.match-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: 8px;
+  padding-bottom: 72px;
+}
+
+/* — intro — */
+.match-picker__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 620px;
+}
+
+.match-picker__intro h1 {
+  margin: 0;
+  font-size: 48px;
+}
+
+.match-picker__intro p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--color-neutral-800);
+  text-wrap: pretty;
+}
+
+/* — two-column layout — */
+.match-picker__layout {
+  display: flex;
+  /* competitions pane on the right (the design's default); use `row` to put it on the left */
+  flex-direction: row-reverse;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.match-picker__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* — competitions pane — */
+.comp-pane {
+  width: 320px;
+  flex: none;
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border-radius: 32px;
+}
+
+.comp-pane__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-left: 4px;
+}
+
+.comp-pane__head h4 {
+  margin: 0;
+}
+
+.comp-pane__count {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.comp-pane__gender {
+  align-self: flex-start;
+  background: var(--color-bg);
+}
+
+/* search input with a leading icon */
+.search-field {
+  position: relative;
+}
+
+.search-field__icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-neutral-700);
+  pointer-events: none;
+}
+
+.search-field .input {
+  padding-left: 38px;
+  min-height: 42px;
+  background: var(--color-bg);
+}
+
+/* loading skeleton */
+.comp-pane__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 12px;
+}
+
+.comp-pane__skeleton-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeleton-bar {
+  display: block;
+  border-radius: 999px;
+  background: var(--color-neutral-300);
+  animation: piqPulse 1.4s ease-in-out infinite;
+}
+
+/* error and empty states */
+.comp-pane__alert {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: var(--space-4);
+  background: var(--color-accent-100);
+  color: var(--color-accent-900);
+  border-radius: 24px;
+}
+
+.comp-pane__alert h5,
+.comp-pane__alert p,
+.comp-pane__empty h5,
+.comp-pane__empty p {
+  margin: 0;
+}
+
+.comp-pane__alert p {
+  font-size: 13px;
+}
+
+.comp-pane__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: var(--space-3) 8px;
+}
+
+.comp-pane__empty p {
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
+
+/* grouped competition list */
+.comp-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-height: 60vh;
+  overflow: auto;
+  margin: 0 -6px;
+  padding: 0 6px;
+}
+
+.comp-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comp-group h6 {
+  margin: 0 0 4px 12px;
+  color: var(--color-neutral-700);
+}
+
+.comp-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.comp-item:hover {
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+}
+
+.comp-item[aria-pressed="true"] {
+  background: var(--color-accent-200);
+  color: var(--color-accent-900);
+}
+
+.comp-item__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.comp-item__name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.comp-item__meta {
+  font-size: 12px;
+  opacity: 0.78;
+}
+
+.comp-item__chevron {
+  display: flex;
+  opacity: 0.55;
+}
+
+/* — main column — */
+.match-picker__back {
+  align-self: flex-start;
+  padding-left: 2px;
+  font-size: 15px;
+}
+
+/* shown before any competition is selected */
+.start-panel {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 280px;
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border-radius: 32px;
+}
+
+/* decorative circles */
+.start-panel::before,
+.start-panel::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+}
+
+.start-panel::before {
+  right: -60px;
+  top: -60px;
+  width: 240px;
+  height: 240px;
+  background: var(--color-accent-2-200);
+}
+
+.start-panel::after {
+  right: 110px;
+  top: 70px;
+  width: 72px;
+  height: 72px;
+  background: var(--color-accent-200);
+}
+
+.start-panel h3,
+.start-panel p {
+  position: relative;
+  margin: 0;
+}
+
+.start-panel p {
+  max-width: 380px;
+  color: var(--color-neutral-800);
+}
+
+/* selected competition heading */
+.comp-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comp-heading__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.comp-heading h2 {
+  margin: 0;
+  font-size: 34px;
+}
+
+/* — phones: one column, list and detail as separate steps — */
+@media (max-width: 759px) {
+  .match-picker {
+    padding-top: 4px;
+    padding-bottom: 40px;
+  }
+
+  .match-picker__intro h1 {
+    font-size: 34px;
+  }
+
+  .comp-pane {
+    width: 100%;
+    position: static;
+  }
+
+  .comp-list {
+    max-height: none;
+  }
+
+  .comp-heading h2 {
+    font-size: 28px;
+  }
+}
+
+/* ── seasons, toolbar and match list ────────────────────────────────── */
+
+.season-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.season-picker h6 {
+  margin: 0 0 0 4px;
+  color: var(--color-neutral-700);
+}
+
+/* a row of pill buttons (seasons, stage chips); scrolls sideways if it overflows */
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 2px;
+}
+
+.pill-row .btn {
+  flex: none;
+  font-family: var(--font-body);
+}
+
+.btn.pill {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 18px;
+}
+
+.btn.chip {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+}
+
+.match-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.match-toolbar__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.match-toolbar__search {
+  flex: 1 1 240px;
+  max-width: 380px;
+}
+
+/* the competitions pane gives its search a cream fill; here it sits on the page, so use the surface */
+.match-toolbar__search .input {
+  background: var(--color-surface);
+}
+
+.match-toolbar__count {
+  flex: 1 1 auto;
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+
+.match-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border-radius: 28px;
+}
+
+.match-empty h4,
+.match-empty p {
+  margin: 0;
+}
+
+.match-empty p {
+  font-size: 14px;
+  color: var(--color-neutral-800);
+}
+
+.match-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.match-section__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-left: 6px;
+}
+
+.match-section__head h4 {
+  margin: 0;
+}
+
+.match-section__head span {
+  font-size: 13px;
+  color: var(--color-neutral-700);
+}
+
+/* one rounded panel holding all rows of a section */
+.match-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--color-surface);
+  border-radius: 28px;
+}
+
+/* Each row is a 6-column grid, so every row's columns line up:
+   date | home team + badge | score | badge + away team | tag | chevron
+   minmax(0, 1fr) lets long names shrink to "…" instead of pushing the score off-centre. */
+.match-row {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 84px minmax(0, 1fr) 110px 18px;
+  grid-template-areas: "when home score away tag chevron";
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 22px;
+}
+
+.match-row:hover {
+  background: var(--color-bg);
+}
+
+.match-row__when {
+  grid-area: when;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.match-row__date {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.match-row__time {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.match-row__team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 15px;
+}
+
+.match-row__team--home {
+  grid-area: home;
+  justify-content: flex-end;
+}
+
+.match-row__team--away {
+  grid-area: away;
+}
+
+.match-row__name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.match-row__name.is-winner {
+  font-weight: 700;
+}
+
+.team-badge {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-neutral-200);
+  color: var(--color-neutral-800);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.match-row__score {
+  grid-area: score;
+  justify-self: center;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  font-family: var(--font-heading);
+  font-size: 19px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.match-row__tag {
+  grid-area: tag;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.match-row__tag .tag {
+  white-space: nowrap;
+}
+
+.match-row__chevron {
+  grid-area: chevron;
+  display: flex;
+  color: var(--color-neutral-600);
+}
+
+/* Narrow screens: same grid, rearranged into two lines —
+   date + tag on top, then home | score | away. */
+@media (max-width: 1079px) {
+  .match-row {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas:
+      "when  when  tag"
+      "home  score away";
+    row-gap: 8px;
+  }
+
+  .match-row__when {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .match-row__chevron {
+    display: none;
+  }
+}
+
+@media (max-width: 759px) {
+  .match-row .team-badge {
+    display: none;
+  }
+
+  .match-row__score {
+    font-size: 17px;
+    padding: 6px 12px;
+  }
+
+  .pill-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}

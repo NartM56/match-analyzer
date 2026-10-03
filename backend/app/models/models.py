@@ -80,6 +80,9 @@ class Match(Base):
     kick_off: Mapped[Optional[time]] = mapped_column(Time)
     home_team_score: Mapped[int] = mapped_column(Integer, nullable=False)
     away_team_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    competition_stage: Mapped[Optional[str]] = mapped_column(Text)
+    match_week: Mapped[Optional[int]] = mapped_column(Integer)
+    group_name: Mapped[Optional[str]] = mapped_column(Text)
 
 
 class Lineup(Base):
@@ -136,10 +139,17 @@ class Event(Base):
     second: Mapped[int] = mapped_column(Integer, nullable=False)
     event_type: Mapped[str] = mapped_column(Text, nullable=False)
     player_id: Mapped[Optional[int]] = mapped_column(ForeignKey("players.id"))
-    team_id: Mapped[Optional[int]] = mapped_column(ForeignKey("teams.id"))
+    team_id: Mapped[Optional[int]] = mapped_column(ForeignKey("teams.id"))  # team performing the event
+    possession: Mapped[Optional[int]] = mapped_column(Integer)  # possession spell number
+    possession_team_id: Mapped[Optional[int]] = mapped_column(ForeignKey("teams.id"))  # team with the ball
+    play_pattern: Mapped[Optional[str]] = mapped_column(Text)
+    under_pressure: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     x: Mapped[Optional[float]] = mapped_column(Float(24))  # REAL
     y: Mapped[Optional[float]] = mapped_column(Float(24))
     end_x: Mapped[Optional[float]] = mapped_column(Float(24))
     end_y: Mapped[Optional[float]] = mapped_column(Float(24))
     outcome: Mapped[Optional[str]] = mapped_column(Text)  # NULL on a pass means completed
-    details: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB)
+    # none_as_null: store Python None as SQL NULL, not the JSON value 'null'
+    details: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB(none_as_null=True))

@@ -39,6 +39,9 @@ CREATE TABLE matches (
     kick_off TIME,
     home_team_score INT NOT NULL,
     away_team_score INT NOT NULL,
+    competition_stage TEXT,
+    match_week INT,
+    group_name TEXT,
     FOREIGN KEY (league_id, season_id) REFERENCES seasons(league_id, id),
     CHECK (home_team_id <> away_team_id)
 );
@@ -76,7 +79,11 @@ CREATE TABLE events (
     second INT NOT NULL,
     event_type TEXT NOT NULL,
     player_id INT REFERENCES players(id),
-    team_id INT REFERENCES teams(id),
+    team_id INT REFERENCES teams(id),        -- team performing the event
+    possession INT,                          -- possession spell number within the match
+    possession_team_id INT REFERENCES teams(id),  -- team with the ball (differs on defensive events)
+    play_pattern TEXT,                       -- Regular Play, From Corner, From Counter, ...
+    under_pressure BOOLEAN NOT NULL DEFAULT FALSE,
     x REAL,
     y REAL,
     end_x REAL,
