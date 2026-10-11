@@ -1,0 +1,134 @@
+/* xG race (Overview tab). Home = terracotta solid line, away = dark olive dashed line,
+   so the two differ by both colour and line style. */
+
+/* the row that holds the xG race (and, for shootout matches later, the shootout card) */
+.xg-row {
+  grid-column: 1 / -1; /* full width inside .overview-grid */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (min-width: 1080px) {
+  .xg-row--with-shootout {
+    grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  }
+}
+
+.xg-card {
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.xg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.xg-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.xg-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xg-legend__line {
+  width: 24px;
+  border-top: 3px solid var(--color-accent-600);
+}
+
+.xg-legend__line--away {
+  border-top: 3px dashed var(--color-accent-2-800);
+}
+
+.xg-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
+
+.xg-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-neutral-800);
+}
+
+/* — the SVG — */
+.xg-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-body);
+}
+
+.xg-extra {
+  fill: var(--color-bg);
+  opacity: 0.7;
+}
+
+.xg-grid {
+  stroke: var(--color-neutral-300);
+  stroke-width: 1;
+}
+
+.xg-divider {
+  stroke: var(--color-neutral-400);
+  stroke-dasharray: 3 4;
+}
+
+.xg-axis-text {
+  fill: var(--color-neutral-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.xg-line {
+  fill: none;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.xg-line--home {
+  stroke: var(--color-accent-600);
+}
+
+.xg-line--away {
+  stroke: var(--color-accent-2-800);
+  stroke-dasharray: 7 5;
+}
+
+.xg-goal {
+  stroke: var(--color-surface);
+  stroke-width: 2;
+}
+
+.xg-goal--home {
+  fill: var(--color-accent-600);
+}
+
+.xg-goal--away {
+  fill: var(--color-accent-2-800);
+}
+
+/* own goal: hollow dot (it added no xG) */
+.xg-goal--own {
+  fill: var(--color-surface);
+  stroke-width: 2.5;
+}
+
+.xg-goal--own.xg-goal--home {
+  stroke: var(--color-accent-600);
+}
+
+.xg-goal--own.xg-goal--away {
+  stroke: var(--color-accent-2-800);
+}

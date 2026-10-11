@@ -1,0 +1,87 @@
+/* Penalty shootout card (Overview tab, next to the xG race). */
+
+.so-card {
+  gap: var(--space-4);
+}
+
+.so-summary {
+  margin: -8px 0 0; /* sits close under the title, like a subtitle */
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
+
+.so-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-neutral-800);
+}
+
+.so-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.so-team {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.so-team__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 14px;
+}
+
+.so-team__score {
+  font-family: var(--font-heading);
+  font-size: 18px;
+}
+
+/* the kicks: a row of circles in the team's colour */
+.so-kicks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.so-kick {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2.5px solid;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.so-kick--home {
+  border-color: var(--color-accent-600);
+  color: var(--color-accent-800);
+}
+
+.so-kick--away {
+  border-color: var(--color-accent-2-800);
+  color: var(--color-accent-2-800);
+}
+
+/* scored: filled in the team colour */
+.so-kick--home.is-scored {
+  background: var(--color-accent-600);
+}
+
+.so-kick--away.is-scored {
+  background: var(--color-accent-2-800);
+}
+
+.so-note {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}

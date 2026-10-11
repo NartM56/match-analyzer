@@ -1,11 +1,12 @@
 import uuid
-from datetime import date, time
+from datetime import date, datetime, time
 from typing import Any, Optional
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Date,
+    DateTime,
     Float,
     ForeignKey,
     ForeignKeyConstraint,
@@ -18,6 +19,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.sql import func
 
 from app.db.base import Base
 
@@ -154,3 +156,20 @@ class Event(Base):
     outcome: Mapped[Optional[str]] = mapped_column(Text)  # NULL on a pass means completed
     # none_as_null: store Python None as SQL NULL, not the JSON value 'null'
     details: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB(none_as_null=True))
+
+
+class MatchSummary(Base):
+    """AI-written match summary: one per match, replaced on "Regenerate"."""
+
+    __tablename__ = "match_summaries"
+
+    match_id: Mapped[int] = mapped_column(
+        ForeignKey("matches.id", ondelete="CASCADE"), primary_key=True
+    )
+    summary: Mapped[str] = mapped_column(Text, nullable=False)
+    facts: Mapped[str] = mapped_column(Text, nullable=False)  # fact sheet sent to the model
+    model: Mapped[str] = mapped_column(Text, nullable=False)
+    prompt_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )

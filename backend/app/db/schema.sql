@@ -94,6 +94,16 @@ CREATE TABLE events (
     UNIQUE (match_id, event_index)
 );
 
+-- AI-written match summary: one per match, replaced when the user clicks "Regenerate".
+CREATE TABLE match_summaries (
+    match_id INT PRIMARY KEY REFERENCES matches(id) ON DELETE CASCADE,
+    summary TEXT NOT NULL,                   -- the text shown on the Overview tab
+    facts TEXT NOT NULL,                     -- the fact sheet sent to the model (for debugging)
+    model TEXT NOT NULL,                     -- which AI model wrote it, e.g. "gpt-4o-mini"
+    prompt_version INT NOT NULL,             -- bump when the prompt changes
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE INDEX idx_matches_season ON matches (league_id, season_id);
 CREATE INDEX idx_lineups_player ON lineups (player_id);
 CREATE INDEX idx_lineups_team ON lineups (team_id);

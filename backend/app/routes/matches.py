@@ -1,15 +1,27 @@
-from datetime import date, time
+from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.analysis.match_events import get_goals, get_penalties, get_periods, get_shootout, get_timeline, get_xg, get_lineups
+from app.analysis.team_stats import get_match_team_stats
+
 from app.db.database import get_db
-from app.models.models import Event, League, Match, Player, Season, Team
+from app.models.models import League, Match, MatchSummary, Season, Team
+from app.analysis.ai_summary import PROMPT_VERSION, build_ai_summary
+from app.core.config import settings
+
 
 router = APIRouter()
+
+
+def _get_match_or_404(db: Session, match_id: int) -> Match:
+    match = db.get(Match, match_id)
+    if not match:
+        raise HTTPException(status_code=404, detail="Match not found")
+    return match
 
 
 class TeamOut(BaseModel):
@@ -49,22 +61,6 @@ class MatchDetailOut(BaseModel):
     goals: list[GoalOut]               # in match order, shootout kicks excluded
 
 
-# minute at which each period's normal time ends; anything later is stoppage time
-PERIOD_END = {1: 45, 2: 90, 3: 105, 4: 120}
-
-
-def minute_label(minute: int, period: int) -> str:
-    """StatsBomb minutes count from 0 (22 = the 23rd minute); stoppage time shows as 45+3'."""
-    end = PERIOD_END.get(period)
-    if end is not None and minute >= end:
-        return f"{end}+{minute - end + 1}'"
-    return f"{minute + 1}'"
-
-
-def display_name(player: Player) -> str:
-    return player.nickname or player.name
-
-
 @router.get("/{match_id}", response_model=MatchDetailOut)
 def get_match(match_id: int, db: Session = Depends(get_db)):
     match = db.get(Match, match_id)
@@ -76,52 +72,10 @@ def get_match(match_id: int, db: Session = Depends(get_db)):
     home = db.get(Team, match.home_team_id)
     away = db.get(Team, match.away_team_id)
 
-    # Goals: scored shots in periods 1-4, plus own goals ("Own Goal Against" carries the
-    # player who scored it; the goal counts for the other team).
-    rows = db.execute(
-        select(Event, Player)
-        .outerjoin(Player, Player.id == Event.player_id)
-        .where(
-            Event.match_id == match_id,
-            Event.period <= 4,
-            (
-                (Event.event_type == "Shot") & (Event.outcome == "Goal")
-            ) | (Event.event_type == "Own Goal Against"),
-        )
-        .order_by(Event.event_index)
-    ).all()
-
-    goals = []
-    for event, player in rows:
-        own_goal = event.event_type == "Own Goal Against"
-        scoring_team = (
-            (away.id if event.team_id == home.id else home.id) if own_goal else event.team_id
-        )
-        goals.append(GoalOut(
-            team_id=scoring_team,
-            player_name=display_name(player) if player else "Unknown",
-            minute_label=minute_label(event.minute, event.period),
-            period=event.period,
-            penalty=(event.details or {}).get("type", {}).get("name") == "Penalty",
-            own_goal=own_goal,
-        ))
-
-    # Extra time / shootout come from which periods have events.
-    periods = set(db.scalars(select(Event.period).where(Event.match_id == match_id).distinct()))
-    penalties = None
-    if 5 in periods:
-        shootout_goals = db.scalars(
-            select(Event.team_id).where(
-                Event.match_id == match_id,
-                Event.period == 5,
-                Event.event_type == "Shot",
-                Event.outcome == "Goal",
-            )
-        ).all()
-        penalties = PenaltiesOut(
-            home=sum(1 for t in shootout_goals if t == home.id),
-            away=sum(1 for t in shootout_goals if t == away.id),
-        )
+    goals = [GoalOut(**g) for g in get_goals(db, match)]
+    periods = get_periods(db, match_id)
+    pens = get_penalties(db, match, periods)
+    penalties = PenaltiesOut(**pens) if pens else None
 
     return MatchDetailOut(
         id=match.id,
@@ -140,3 +94,146 @@ def get_match(match_id: int, db: Session = Depends(get_db)):
         penalties=penalties,
         goals=goals,
     )
+    
+class TeamStatsSide(BaseModel):
+    possession: float       # % of time on the ball (PlayIQ estimate)
+    xg: float
+    shots: int
+    shots_on_target: int
+    passes: int
+    pass_accuracy: float    # % of passes completed
+    corners: int
+    fouls: int
+    yellow_cards: int
+    red_cards: int
+
+
+class TeamStatsOut(BaseModel):
+    home_team_stats: TeamStatsSide
+    away_team_stats: TeamStatsSide
+
+
+@router.get("/{match_id}/team_stats", response_model=TeamStatsOut)
+def get_team_stats(match_id: int, db: Session = Depends(get_db)):
+    _get_match_or_404(db, match_id)
+    home_team_stats, away_team_stats = get_match_team_stats(db, match_id)
+    return {"home_team_stats": home_team_stats, "away_team_stats": away_team_stats}
+
+
+class SummaryOut(BaseModel):
+    summary: str
+    model: str
+    prompt_version: int
+    created_at: datetime
+
+
+# Minimum time between two generations for the same match, so "Regenerate"
+# can't be clicked repeatedly (every call costs money).
+REGENERATE_COOLDOWN = timedelta(seconds=60)
+
+
+@router.get("/{match_id}/ai_summary", response_model=SummaryOut)
+def get_ai_summary(match_id: int, db: Session = Depends(get_db)):
+    """Read the saved summary. Never calls the AI: opening the tab shouldn't cost money."""
+    _get_match_or_404(db, match_id)
+    saved = db.get(MatchSummary, match_id)
+    if not saved:
+        # the frontend shows the "Explain this match" button on this 404
+        raise HTTPException(status_code=404, detail="No summary yet")
+    return saved
+
+
+@router.post("/{match_id}/ai_summary", response_model=SummaryOut)
+def post_ai_summary(match_id: int, db: Session = Depends(get_db)):
+    """Generate a summary (first time or "Regenerate") and save it, replacing any old one."""
+    _get_match_or_404(db, match_id)
+
+    saved = db.get(MatchSummary, match_id)
+    now = datetime.now(timezone.utc)
+    if saved and now - saved.created_at < REGENERATE_COOLDOWN:
+        raise HTTPException(status_code=429, detail="Please wait a moment before regenerating")
+
+    try:
+        summary, facts = build_ai_summary(match_id, db)
+    except Exception as err:
+        # AI service down, timed out, etc. Keep the old summary (if any) untouched.
+        raise HTTPException(status_code=502, detail="Couldn't write the explanation") from err
+
+    row = db.merge(MatchSummary(
+        match_id=match_id,
+        summary=summary,
+        facts=facts,
+        model=settings.OPENAI_MODEL,
+        prompt_version=PROMPT_VERSION,
+        created_at=now,  # set explicitly: the DB default only applies on insert, not on regenerate
+    ))
+    db.commit()
+    db.refresh(row)
+    return row
+
+@router.get("/{match_id}/timeline")
+def get_match_timeline(match_id: int, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    timeline, periods = get_timeline(db, match)
+    return {"timeline": timeline, "periods": periods}
+
+class XgShotOut(BaseModel):
+    event_index: int
+    team_id: int            # an own goal counts for the other team
+    player_name: str
+    period: int
+    minute: int
+    second: int
+    minute_label: str
+    xg: float               # 0 for own goals (they aren't shots)
+    outcome: Optional[str]  # "Goal", "Saved", "Off T", ... or "Own Goal"
+    goal: bool
+    penalty: bool
+    own_goal: bool
+
+
+class PeriodEndOut(BaseModel):
+    period: int
+    end_minute: int
+
+
+class XgOut(BaseModel):
+    shots: list[XgShotOut]
+    periods: list[PeriodEndOut]
+
+
+@router.get("/{match_id}/xg", response_model=XgOut)
+def get_match_xg(match_id: int, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    return get_xg(db, match)
+
+class ShootoutKickOut(BaseModel):
+    order: int          # 1, 2, 3, ... across both teams
+    taken: int          # this team's 1st, 2nd, ... kick
+    team_id: int
+    player_name: str
+    goal: bool
+    result: str         # "Scored", "Saved", "Hit the post", "Missed"
+
+
+class ShootoutOut(BaseModel):
+    home_score: int
+    away_score: int
+    winner_team_id: int
+    first_team_id: int  # the team that kicked first
+    kicks: list[ShootoutKickOut]
+
+
+@router.get("/{match_id}/shootout", response_model=ShootoutOut)
+def get_match_shootout(match_id: int, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    shootout = get_shootout(db, match)
+    if shootout is None:
+        raise HTTPException(status_code=404, detail="No penalty shootout in this match")
+    return shootout
+
+@router.get("/{match_id}/lineups")
+def get_match_lineups(match_id: int, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    return get_lineups(db, match)
+    

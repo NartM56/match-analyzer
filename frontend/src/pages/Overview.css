@@ -1,0 +1,356 @@
+/* Overview tab — from the "Match Analysis" prototype.
+   Home team = terracotta (accent-600 for bars and dots; the darker accent-700 behind
+   white text so it stays readable). Away team = dark olive (accent-2-800). The two differ
+   mainly in lightness, so they stay distinct for colour-blind viewers. */
+
+/* two columns on desktop: team stats now, the AI summary card goes next to it later */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.overview-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: 28px;
+  background: var(--color-surface);
+  border-radius: 32px;
+}
+
+.overview-card h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.overview-card__note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+/* — card header: "● ARG   Team stats   FRA ●" — */
+.team-stats__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.team-key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.team-key__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.team-key__dot--home {
+  background: var(--color-accent-600);
+}
+
+.team-key__dot--away {
+  background: var(--color-accent-2-800);
+}
+
+/* — stat rows — */
+.team-stats__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* home value | label | away value */
+.stat-row__numbers {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr) 80px;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-row__label {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
+
+.stat-row__value {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums; /* digits line up between rows */
+}
+
+.stat-row__value--home {
+  justify-self: start;
+}
+
+.stat-row__value--away {
+  justify-self: end;
+}
+
+/* the leading team's number gets a filled pill in its colour */
+.stat-row__value.is-lead {
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-row__value--home.is-lead {
+  background: var(--color-accent-700);
+}
+
+.stat-row__value--away.is-lead {
+  background: var(--color-accent-2-800);
+}
+
+/* the split bar: each side's width is proportional to its value (set by flex-grow inline) */
+.stat-row__bars {
+  display: flex;
+  gap: 4px;
+  height: 8px;
+}
+
+.stat-row__bar {
+  flex-basis: 0;
+  min-width: 4px;
+  border-radius: 999px;
+}
+
+.stat-row__bar--home {
+  background: var(--color-accent-600);
+}
+
+.stat-row__bar--away {
+  background: var(--color-accent-2-800);
+}
+
+/* the trailing side fades back so the leader stands out */
+/* a faded version of the home terracotta (not the pinker accent-300), so it still
+   reads as the home team, just behind */
+.stat-row__bar--home.is-trailing {
+  background: color-mix(in srgb, var(--color-accent-600) 40%, var(--color-surface));
+}
+
+.stat-row__bar--away.is-trailing {
+  background: var(--color-accent-2-300);
+}
+
+/* — cards row — */
+.cards-row {
+  padding-top: 4px;
+}
+
+.cards-row__value {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cards-row__value--end {
+  justify-self: end;
+}
+
+.card-icon {
+  width: 11px;
+  height: 15px;
+  border-radius: 3px;
+}
+
+.card-icon--yellow {
+  background: oklch(0.86 0.15 92);
+}
+
+.card-icon--red {
+  margin-left: 6px;
+  background: oklch(0.58 0.19 27);
+}
+
+/* — narrower screens: one column, tighter padding — */
+@media (max-width: 1079px) {
+  .overview-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 759px) {
+  .overview-card {
+    padding: 20px;
+  }
+
+  .stat-row__numbers {
+    grid-template-columns: 64px minmax(0, 1fr) 64px;
+  }
+}
+
+/* — "What happened" AI card — */
+.ai-card {
+  position: relative;
+  overflow: hidden;
+  gap: var(--space-4);
+}
+
+/* decorative sage circle in the corner; everything else sits above it */
+.ai-card__blob {
+  position: absolute;
+  right: -70px;
+  top: -70px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: var(--color-accent-2-200);
+}
+
+.ai-card > *:not(.ai-card__blob) {
+  position: relative;
+}
+
+.ai-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ai-card__tag {
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ai-card__idle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.ai-card__idle p {
+  margin: 0;
+  max-width: 440px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--color-neutral-900);
+  text-wrap: pretty;
+}
+
+.ai-card__cta {
+  font-size: 15px;
+  padding: 10px 20px;
+}
+
+.ai-card__hint {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+/* loading: spinner + placeholder lines */
+.ai-card__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ai-card__progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent-2-800);
+}
+
+.ai-card__spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2.5px solid var(--color-accent-2-300);
+  border-top-color: var(--color-accent-2-800);
+  animation: piqSpin 0.9s linear infinite;
+}
+
+@keyframes piqSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* the summary itself */
+.ai-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ai-card__text p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* minutes like 23' get a small terracotta pill */
+.ai-card__minute {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--color-accent-100);
+  color: var(--color-accent-900);
+  font-weight: 700;
+}
+
+.ai-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.ai-card__footer span {
+  max-width: 340px;
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.ai-card__footer .btn-ghost {
+  font-size: 13px;
+}
+
+/* error box */
+.ai-card__error {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: var(--space-4);
+  background: var(--color-accent-100);
+  color: var(--color-accent-900);
+  border-radius: 24px;
+}
+
+.ai-card__error h5,
+.ai-card__error p {
+  margin: 0;
+}
+
+.ai-card__error p {
+  font-size: 13px;
+}

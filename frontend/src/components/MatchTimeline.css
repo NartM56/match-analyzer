@@ -1,0 +1,312 @@
+/* Match timeline (Overview tab). Home = terracotta, above the line; away = dark olive, below. */
+
+.overview-card--wide {
+  grid-column: 1 / -1; /* span both columns of .overview-grid */
+}
+
+.tl-card-section {
+  gap: var(--space-4);
+}
+
+.tl-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tl-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.tl-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tl-legend__hint {
+  color: var(--color-neutral-700);
+}
+
+.tl-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-neutral-800);
+}
+
+/* on narrow screens the timeline scrolls sideways instead of squashing the markers */
+.tl-scroll {
+  overflow-x: auto;
+}
+
+.tl-grid {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 560px;
+}
+
+.tl-teams {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px 0 30px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tl-teams__home {
+  color: var(--color-accent-700);
+}
+
+.tl-teams__away {
+  color: var(--color-accent-2-800);
+}
+
+.tl-area {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0 10px;
+}
+
+.tl-track {
+  position: relative;
+}
+
+/* extra-time shading and its label */
+.tl-extra {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--color-bg);
+  border-radius: 16px;
+  opacity: 0.7;
+}
+
+.tl-extra__label {
+  position: absolute;
+  top: 4px;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-neutral-700);
+}
+
+/* dashed lines between periods */
+.tl-divider {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  border-left: 2px dashed var(--color-neutral-400);
+}
+
+/* the match line */
+.tl-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-neutral-300);
+}
+
+/* each marker is a small button centred on its minute */
+.tl-marker {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transform: translateX(-50%);
+  transition: transform 0.12s ease;
+}
+
+.tl-marker:hover,
+.tl-marker.is-selected {
+  transform: translateX(-50%) scale(1.25);
+}
+
+/* — icons — */
+.tl-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.tl-icon--goal {
+  width: 22px;
+  height: 22px;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.tl-icon--goal.tl-icon--home {
+  background: var(--color-accent-600);
+}
+
+.tl-icon--goal.tl-icon--away {
+  background: var(--color-accent-2-800);
+}
+
+.tl-icon--goal.tl-icon--legend {
+  width: 12px;
+  height: 12px;
+  box-shadow: none;
+  background: var(--color-neutral-800);
+}
+
+.tl-icon__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+
+.tl-icon--legend .tl-icon__dot {
+  width: 4px;
+  height: 4px;
+}
+
+/* own goal: same ball, with a dashed outline so it reads differently */
+.tl-icon--own-goal {
+  outline: 2px dashed var(--color-neutral-700);
+  outline-offset: 2px;
+}
+
+.tl-icon--sub {
+  width: 14px;
+  height: 14px;
+  border: 2.5px solid;
+  background: var(--color-surface);
+}
+
+.tl-icon--sub.tl-icon--home {
+  border-color: var(--color-accent-600);
+}
+
+.tl-icon--sub.tl-icon--away {
+  border-color: var(--color-accent-2-800);
+}
+
+.tl-icon--sub.tl-icon--legend {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+  border-color: var(--color-neutral-800);
+}
+
+.tl-card {
+  display: inline-block;
+  width: 12px;
+  height: 17px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.tl-legend .tl-card {
+  width: 9px;
+  height: 13px;
+  box-shadow: none;
+}
+
+.tl-card--yellow {
+  background: oklch(0.86 0.15 92);
+}
+
+.tl-card--red {
+  background: oklch(0.58 0.19 27);
+}
+
+/* second yellow: a yellow card with a red one peeking out behind it */
+.tl-icon--second-yellow {
+  position: relative;
+  width: 18px;
+  height: 20px;
+  border-radius: 0;
+}
+
+.tl-icon--second-yellow .tl-card {
+  position: absolute;
+}
+
+.tl-icon--second-yellow .tl-card--red {
+  left: 6px;
+  top: 3px;
+}
+
+.tl-icon--second-yellow .tl-card--yellow {
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+/* — popup — */
+.tl-popup {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: max-content;
+  max-width: 260px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 13px;
+  box-shadow: var(--shadow-md);
+}
+
+.tl-popup__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tl-popup__text strong {
+  font-size: 14px;
+}
+
+.tl-popup__team {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.tl-popup__close {
+  padding: 0 4px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* — minute labels under the axis — */
+.tl-marks {
+  position: relative;
+  height: 18px;
+  font-size: 11px;
+  color: var(--color-neutral-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.tl-mark {
+  position: absolute;
+  white-space: nowrap;
+}
