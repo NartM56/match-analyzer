@@ -1,0 +1,543 @@
+/* Passing tab. Uses .overview-card (from Overview.css) for the card look and the shared pitch
+   from components/ShotMap. The chosen team's colour is --pa-team (home terracotta, away dark olive). */
+
+.pa-team--home {
+  --pa-team: var(--color-accent-700);
+  --pa-team-text: var(--color-accent-800);
+}
+
+.pa-team--away {
+  --pa-team: var(--color-accent-2-800);
+  --pa-team-text: var(--color-accent-2-800);
+}
+
+.pa-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pa-card {
+  gap: var(--space-4);
+}
+
+.pa-message {
+  margin: 0;
+  color: var(--color-neutral-800);
+}
+
+.pa-note {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+  text-wrap: pretty;
+}
+
+.pa-definition {
+  margin: 0;
+  max-width: 760px;
+}
+
+.pa-sub {
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
+
+.pa-nowrap {
+  white-space: nowrap;
+}
+
+/* the period and pass-type switches scroll sideways on narrow screens instead of wrapping */
+.pa-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pa-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pa-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pa-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pa-head__text h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.pa-select {
+  width: auto;
+  min-width: 210px;
+  max-width: 100%;
+  min-height: 40px;
+  background: var(--color-bg);
+}
+
+.pa-seg {
+  background: var(--color-bg);
+}
+
+/* — pitch | side panels — */
+.pa-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.pa-body--wide {
+  grid-template-columns: minmax(0, 1.9fr) minmax(260px, 1fr);
+  column-gap: var(--space-8);
+}
+
+.pa-pitch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  justify-self: center;
+}
+
+.pa-pitch--vertical {
+  max-width: 420px;
+}
+
+.pa-pitch__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+}
+
+.pa-pitch__team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pa-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--pa-team);
+}
+
+.pa-pitch__frame {
+  position: relative;
+  padding: 12px;
+  border-radius: 24px;
+  background: var(--color-bg);
+}
+
+.pa-map {
+  overflow: visible;
+}
+
+.pa-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.pa-empty span {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* — network — */
+.pa-link {
+  stroke: var(--pa-team);
+  stroke-linecap: round;
+}
+
+.pa-node {
+  cursor: pointer;
+  outline: none;
+}
+
+.pa-node__circle {
+  fill: var(--pa-team);
+  stroke: var(--color-accent-2-100);
+  stroke-width: 0.6;
+}
+
+.pa-node__ring {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: 0.5;
+}
+
+.pa-node__number {
+  fill: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.pa-node__name {
+  fill: var(--color-text);
+  stroke: var(--color-accent-2-100);
+  paint-order: stroke;
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+/* — side panels — */
+.pa-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.pa-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 24px;
+  background: var(--color-bg);
+}
+
+.pa-panel h5,
+.pa-panel p {
+  margin: 0;
+}
+
+.pa-panel--empty {
+  gap: 6px;
+}
+
+.pa-panel--empty p {
+  font-size: 13px;
+  color: var(--color-neutral-800);
+  text-wrap: pretty;
+}
+
+.pa-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pa-who__number {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--pa-team);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pa-who__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pa-who__text span {
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pa-facts {
+  display: flex;
+  gap: 12px;
+}
+
+.pa-facts > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pa-facts span {
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pa-facts strong {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 20px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-partners {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pa-partners__title {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pa-partners__row,
+.pa-links__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.pa-partners__row strong {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-small-btn {
+  align-self: flex-start;
+  font-size: 13px;
+}
+
+.pa-links {
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.pa-links__item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pa-links__row strong {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-bar {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-neutral-200);
+}
+
+.pa-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--pa-team);
+}
+
+/* — pass map — */
+.pa-stats {
+  display: flex;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+
+.pa-stats > div {
+  min-width: 84px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pa-stats span {
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pa-stats strong {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 24px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-pass {
+  stroke: var(--pa-team);
+  stroke-width: 0.42;
+}
+
+.pa-pass--miss {
+  stroke: var(--color-neutral-600);
+  stroke-width: 0.38;
+  stroke-dasharray: 1.2 0.9;
+}
+
+.pa-arrow {
+  fill: var(--pa-team);
+}
+
+.pa-arrow--miss {
+  fill: var(--color-neutral-600);
+}
+
+.pa-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-left: 4px;
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pa-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pa-key {
+  width: 22px;
+  border-top: 2.5px solid var(--pa-team);
+}
+
+.pa-key--miss {
+  border-top: 2.5px dashed var(--color-neutral-600);
+}
+
+/* "Passers" table */
+.pa-passers {
+  gap: 0;
+  padding: 8px 6px;
+  min-width: 0;
+}
+
+.pa-passers__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px 8px;
+}
+
+.pa-passers__head span {
+  font-size: 12px;
+  color: var(--color-neutral-700);
+}
+
+.pa-passers__row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 46px 44px 38px;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.pa-passers__row > span:nth-child(n + 3) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+button.pa-passers__row:hover,
+.pa-passers__row.is-on {
+  background: var(--color-surface);
+}
+
+button.pa-passers__row:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: -2px;
+}
+
+.pa-passers__cols {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-neutral-700);
+  cursor: default;
+}
+
+.pa-passers__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pa-passers__list--scroll {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.pa-passers__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pa-passers__row.is-on .pa-passers__name {
+  font-weight: 700;
+}
+
+.pa-passers__n {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pa-num {
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--pa-team);
+  color: var(--pa-team-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.pa-num--starter {
+  background: var(--pa-team);
+  color: #fff;
+}
+
+.pa-passers__foot {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+}

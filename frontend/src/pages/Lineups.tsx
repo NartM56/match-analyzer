@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import type { LineupPlayer, MatchDetail, MatchLineups } from "../types/api";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { PlayerPanel } from "../components/PlayerPanel";
+import { shortName } from "../utils/format";
 import "./Lineups.css";
 
 type Side = "home" | "away";
@@ -34,17 +36,6 @@ const POSITION_SPOTS: Record<string, [number, number]> = {
   "Center Forward": [106, 40],
   "Left Center Forward": [104, 28],
 };
-
-const SURNAME_PARTICLES = new Set(["de", "di", "da", "del", "dos", "van", "von", "der", "la", "le", "el", "al", "ben", "mac"]);
-
-/** Short name for the pitch: "Lionel Messi" → "Messi", "Ángel Di María" → "Di María". */
-function shortName(name: string): string {
-  const words = name.split(" ");
-  if (words.length < 2) return name;
-  const last = words[words.length - 1];
-  const before = words[words.length - 2];
-  return SURNAME_PARTICLES.has(before.toLowerCase()) ? `${before} ${last}` : last;
-}
 
 /** Percent position of a starter on the pitch. Home attacks right (or up on a vertical pitch),
  *  away is mirrored. */
@@ -94,7 +85,67 @@ function Pitch({ vertical }: { vertical: boolean }) {
   );
 }
 
-function Bench({ side, teamName, players }: { side: Side; teamName: string; players: LineupPlayer[] }) {
+/* ── Goals and cards ── */
+
+/** "goal 23' (pen), 108'" / "own goal 70'" / "yellow card 45+7'" — for tooltips and screen readers. */
+function eventsText(p: LineupPlayer): string {
+  const parts: string[] = [];
+  const goals = p.goals.filter((g) => !g.own_goal);
+  const ownGoals = p.goals.filter((g) => g.own_goal);
+  const when = (label: string, period: number) => (period === 5 ? "in the shootout" : label);
+  if (goals.length) {
+    parts.push(`${goals.length === 1 ? "goal" : `${goals.length} goals`} ${goals.map((g) => g.minute_label + (g.penalty ? " (pen)" : "")).join(", ")}`);
+  }
+  if (ownGoals.length) parts.push(`own goal ${ownGoals.map((g) => g.minute_label).join(", ")}`);
+  for (const c of p.yellow_red_cards) {
+    const name = c.card === "Second Yellow" ? "second yellow, sent off" : c.card.toLowerCase();
+    parts.push(`${name} ${when(c.minute_label, c.period)}`);
+  }
+  return parts.join(", ");
+}
+
+/** The most serious card decides the icon: a red, a second yellow (yellow + red), or a yellow. */
+function worstCard(p: LineupPlayer): "red" | "second-yellow" | "yellow" | null {
+  const cards = p.yellow_red_cards.map((c) => c.card);
+  if (cards.includes("Red Card")) return "red";
+  if (cards.includes("Second Yellow")) return "second-yellow";
+  return cards.length ? "yellow" : null;
+}
+
+function EventIcons({ player, compact = false }: { player: LineupPlayer; compact?: boolean }) {
+  const goals = player.goals.filter((g) => !g.own_goal).length;
+  const ownGoals = player.goals.filter((g) => g.own_goal).length;
+  const card = worstCard(player);
+  if (!goals && !ownGoals && !card) return null;
+  return (
+    <span className={`lu-events${compact ? " lu-events--compact" : ""}`} aria-hidden="true">
+      {goals > 0 && (
+        <span className="lu-ball">
+          <span className="lu-ball__dot" />
+          {goals > 1 && <span className="lu-ball__count">{goals}</span>}
+        </span>
+      )}
+      {ownGoals > 0 && (
+        <span className="lu-ball lu-ball--own">
+          <span className="lu-ball__dot" />
+          <span className="lu-ball__count">OG</span>
+        </span>
+      )}
+      {card === "second-yellow" ? (
+        <span className="lu-card-pair">
+          <span className="lu-card lu-card--yellow" />
+          <span className="lu-card lu-card--red" />
+        </span>
+      ) : (
+        card && <span className={`lu-card lu-card--${card}`} />
+      )}
+    </span>
+  );
+}
+
+type BenchProps = { side: Side; teamName: string; players: LineupPlayer[]; onOpen: (playerId: number) => void };
+
+function Bench({ side, teamName, players, onOpen }: BenchProps) {
   const [showUnused, setShowUnused] = useState(false);
   const used = players.filter((p) => p.minutes_played !== null);
   const unused = players.filter((p) => p.minutes_played === null);
@@ -114,17 +165,39 @@ function Bench({ side, teamName, players }: { side: Side; teamName: string; play
 
       <ul className="lu-bench__list">
         {shown.map((p) => (
-          <li key={p.player_id} className={`lu-bench__row${p.minutes_played === null ? " is-unused" : ""}`}>
-            <span className={`lu-number lu-number--${side}`}>{p.jersey_number}</span>
-            <span className="lu-bench__name">
-              <span>{p.player_name}</span>
-              {p.position && <span className="lu-bench__meta">{p.position}</span>}
-            </span>
-            {p.minutes_played !== null ? (
-              <span className={`lu-minutes lu-minutes--${side}`}>{p.minutes_played}'</span>
-            ) : (
-              <span className="lu-bench__meta">Unused</span>
-            )}
+          <li key={p.player_id}>
+            <button
+              type="button"
+              className={`lu-bench__row${p.minutes_played === null ? " is-unused" : ""}`}
+              title={eventsText(p) || undefined}
+              onClick={() => onOpen(p.player_id)}
+            >
+              <span className={`lu-number lu-number--${side}`}>{p.jersey_number}</span>
+              <span className="lu-bench__name">
+                <span className="lu-bench__name-line">
+                  <span className="lu-bench__name-text">{p.player_name}</span>
+                  <EventIcons player={p} compact />
+                </span>
+                {/* "Left Back · for Acuña" */}
+                {(p.position || p.subbed_on) && (
+                  <span className="lu-bench__meta">
+                    {[p.position, p.subbed_on && `for ${p.subbed_on.replaced}`].filter(Boolean).join(" · ")}
+                  </span>
+                )}
+              </span>
+              {p.subbed_on ? (
+                <span className="lu-bench__when">
+                  <span className={`lu-sub lu-sub--on lu-sub--${side}`} aria-label={`came on ${p.subbed_on.minute_label}`}>
+                    ↑ {p.subbed_on.minute_label}
+                  </span>
+                  <span className={`lu-minutes lu-minutes--${side}`}>{p.minutes_played}'</span>
+                </span>
+              ) : p.minutes_played !== null ? (
+                <span className={`lu-minutes lu-minutes--${side}`}>{p.minutes_played}'</span>
+              ) : (
+                <span className="lu-bench__meta">Unused</span>
+              )}
+            </button>
           </li>
         ))}
       </ul>
@@ -144,6 +217,12 @@ export function Lineups() {
   const [failed, setFailed] = useState(false);
   // narrower screens: turn the pitch upright so the names have room
   const vertical = useMediaQuery("(max-width: 1099px)");
+  // the open player lives in the URL (?player=5503), so the panel survives a refresh
+  // and the browser's back button closes it
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openId = Number(searchParams.get("player")) || null;
+  const openPlayer = (playerId: number) => setSearchParams({ player: String(playerId) });
+  const closePlayer = useCallback(() => setSearchParams({}), [setSearchParams]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -172,8 +251,9 @@ export function Lineups() {
     { side: "home" as Side, id: match.home_team.id, name: match.home_team.name },
     { side: "away" as Side, id: match.away_team.id, name: match.away_team.name },
   ].map((t) => {
-    const squad = lineups[String(t.id)] ?? []; // JSON object keys are strings
-    return { ...t, starters: squad.filter((p) => p.starter), bench: squad.filter((p) => !p.starter) };
+    const squad = lineups.players[String(t.id)] ?? []; // JSON object keys are strings
+    const formation = lineups.formations[String(t.id)];
+    return { ...t, formation, starters: squad.filter((p) => p.starter), bench: squad.filter((p) => !p.starter) };
   });
 
   return (
@@ -186,6 +266,7 @@ export function Lineups() {
               <span key={t.side}>
                 <span className={`lu-dot lu-dot--${t.side}`} />
                 {t.name}
+                {t.formation && <span className="lu-formation">{t.formation}</span>}
               </span>
             ))}
           </div>
@@ -196,19 +277,30 @@ export function Lineups() {
           {teams.map((t) =>
             t.starters.map((p) => {
               const { left, top } = spotOnPitch(p.position, t.side, vertical);
-              const label = `${p.jersey_number} ${p.player_name}, ${p.position ?? "position unknown"}, ${p.minutes_played ?? 0} minutes`;
+              const events = eventsText(p);
+              const off = p.subbed_off ? `, subbed off ${p.subbed_off.minute_label} for ${p.subbed_off.replaced_by}` : "";
+              const label = `${p.jersey_number} ${p.player_name}, ${p.position ?? "position unknown"}, ${p.minutes_played ?? 0} minutes${off}${events ? `, ${events}` : ""}`;
               return (
-                <div
+                <button
+                  type="button"
                   key={p.player_id}
                   className="lu-player"
                   style={{ left: `${left}%`, top: `${top}%` }}
-                  role="img"
-                  aria-label={label}
+                  aria-label={`${label}. Show player stats`}
                   title={label}
+                  onClick={() => openPlayer(p.player_id)}
                 >
-                  <span className={`lu-player__number lu-player__number--${t.side}`}>{p.jersey_number}</span>
+                  <span className="lu-player__badge">
+                    <span className={`lu-player__number lu-player__number--${t.side}`}>{p.jersey_number}</span>
+                    <EventIcons player={p} />
+                    {p.subbed_off && (
+                      <span className="lu-sub lu-sub--off" aria-hidden="true">
+                        ↓ {p.subbed_off.minute_label}
+                      </span>
+                    )}
+                  </span>
                   <span className="lu-player__name">{shortName(p.player_name)}</span>
-                </div>
+                </button>
               );
             }),
           )}
@@ -217,9 +309,11 @@ export function Lineups() {
 
       <div className="lu-benches">
         {teams.map((t) => (
-          <Bench key={t.side} side={t.side} teamName={t.name} players={t.bench} />
+          <Bench key={t.side} side={t.side} teamName={t.name} players={t.bench} onOpen={openPlayer} />
         ))}
       </div>
+
+      {openId && <PlayerPanel match={match} playerId={openId} onClose={closePlayer} />}
     </div>
   );
 }

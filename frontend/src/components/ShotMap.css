@@ -1,0 +1,100 @@
+/* Shared shot map (player panel + Shots tab). Home = terracotta, away = dark olive. */
+
+.sm-team--home {
+  --sm-team: var(--color-accent-700);
+}
+
+.sm-team--away {
+  --sm-team: var(--color-accent-2-800);
+}
+
+.sm-map {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sm-grass {
+  fill: var(--color-accent-2-100);
+}
+
+.sm-lines {
+  fill: none;
+  stroke: var(--color-accent-2-300);
+  stroke-width: 0.5;
+}
+
+.sm-lines__spot {
+  fill: var(--color-accent-2-300);
+  stroke: none;
+}
+
+/* markers: goal = filled, saved = outlined, off target = dashed, blocked = diamond */
+.sm-shot {
+  cursor: pointer;
+  outline: none;
+}
+
+.sm-shot--goal circle:not(.sm-shot__ring) {
+  fill: var(--sm-team);
+  stroke: var(--color-bg);
+  stroke-width: 0.5;
+}
+
+.sm-shot--saved circle:not(.sm-shot__ring) {
+  fill: var(--color-bg);
+  stroke: var(--sm-team);
+  stroke-width: 0.9;
+}
+
+.sm-shot--off circle:not(.sm-shot__ring) {
+  fill: none;
+  stroke: var(--sm-team);
+  stroke-width: 0.7;
+  stroke-dasharray: 1.1 0.8;
+}
+
+.sm-shot--blocked rect {
+  fill: var(--color-accent-2-100);
+  stroke: var(--sm-team);
+  stroke-width: 0.8;
+}
+
+.sm-shot__ring {
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: 0.5;
+}
+
+/* legend icons (text colour unless a team is given) */
+.sm-icon {
+  --sm-icon: var(--sm-team, var(--color-text));
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.sm-icon--goal {
+  background: var(--sm-icon);
+}
+
+.sm-icon--saved {
+  border: 2.5px solid var(--sm-icon);
+  background: var(--color-bg);
+}
+
+.sm-icon--off {
+  border: 2px dashed var(--sm-icon);
+}
+
+.sm-icon--blocked {
+  width: 9px;
+  height: 9px;
+  margin: 0 1.5px;
+  border-radius: 0;
+  border: 2px solid var(--sm-icon);
+  transform: rotate(45deg);
+}

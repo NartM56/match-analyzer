@@ -66,3 +66,14 @@ export function teamCode(teamName: string) {
 export function formatFullDate(isoDate: string) {
   return `${formatDate(isoDate)} ${isoDate.slice(0, 4)}`;
 }
+
+const SURNAME_PARTICLES = new Set(["de", "di", "da", "del", "dos", "van", "von", "der", "la", "le", "el", "al", "ben", "mac"]);
+
+/** Short name for the pitch: "Lionel Messi" → "Messi", "Ángel Di María" → "Di María". */
+export function shortName(name: string): string {
+  const words = name.split(" ");
+  if (words.length < 2) return name;
+  const last = words[words.length - 1];
+  const before = words[words.length - 2];
+  return SURNAME_PARTICLES.has(before.toLowerCase()) ? `${before} ${last}` : last;
+}

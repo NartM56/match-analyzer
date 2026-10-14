@@ -5,11 +5,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.analysis.match_events import get_goals, get_penalties, get_periods, get_shootout, get_timeline, get_xg, get_lineups
+from app.analysis.match_events import get_goals, get_passes, get_penalties, get_periods, get_shootout, get_timeline, get_xg, get_lineups, get_player_events
 from app.analysis.team_stats import get_match_team_stats
 
 from app.db.database import get_db
-from app.models.models import League, Match, MatchSummary, Season, Team
+from app.models.models import League, Lineup, Match, MatchSummary, Season, Team
 from app.analysis.ai_summary import PROMPT_VERSION, build_ai_summary
 from app.core.config import settings
 
@@ -181,6 +181,7 @@ class XgShotOut(BaseModel):
     event_index: int
     team_id: int            # an own goal counts for the other team
     player_name: str
+    player_id: Optional[int] = None
     period: int
     minute: int
     second: int
@@ -190,6 +191,12 @@ class XgShotOut(BaseModel):
     goal: bool
     penalty: bool
     own_goal: bool
+    x: Optional[float] = None
+    y: Optional[float] = None
+    end_x: Optional[float] = None
+    end_y: Optional[float] = None
+    body_part: Optional[str] = None
+    shot_type: Optional[str] = None
 
 
 class PeriodEndOut(BaseModel):
@@ -236,4 +243,32 @@ def get_match_shootout(match_id: int, db: Session = Depends(get_db)):
 def get_match_lineups(match_id: int, db: Session = Depends(get_db)):
     match = _get_match_or_404(db, match_id)
     return get_lineups(db, match)
-    
+
+@router.get("/{match_id}/players/{player_id}")
+def get_match_player_events(match_id: int, player_id: int, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    if db.get(Lineup, (match_id, player_id)) is None:
+        raise HTTPException(status_code=404, detail="Player not in this match")
+    return get_player_events(db, match, player_id)
+
+
+class PassOut(BaseModel):
+    event_index: int
+    team_id: int
+    player_id: Optional[int] = None
+    player_name: str
+    period: int
+    x: Optional[float] = None
+    y: Optional[float] = None
+    end_x: Optional[float] = None
+    end_y: Optional[float] = None
+    completed: bool
+    recipient_id: Optional[int] = None
+    is_progressive: bool
+    into_final_third: bool
+    into_box: bool
+
+@router.get("/{match_id}/passes", response_model=list[PassOut])
+def get_match_passes(match_id: int, player_id: int | None = None, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    return get_passes(db, match, player_id)

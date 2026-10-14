@@ -230,11 +230,6 @@
   font-weight: 600;
 }
 
-.lu-bench__name > span:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .is-unused .lu-bench__name {
   font-weight: 500;
@@ -275,4 +270,190 @@
   .lu-benches {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* — goal and card icons (on the pitch dot, and after names on the bench) — */
+.lu-player__badge {
+  position: relative;
+  display: block;
+}
+
+/* on the pitch they sit on the bottom-right edge of the shirt-number circle */
+.lu-events {
+  position: absolute;
+  right: -12px;
+  bottom: -6px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 3px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* on the bench they follow the name inline */
+.lu-events--compact {
+  position: static;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.lu-ball {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.lu-ball__dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--color-text);
+  box-shadow: inset 0 0 0 3.5px var(--color-text), inset 0 0 0 6px var(--color-bg);
+}
+
+/* own goal: hollow ball + "OG" */
+.lu-ball--own .lu-ball__dot {
+  background: var(--color-bg);
+  box-shadow: inset 0 0 0 2px var(--color-text);
+}
+
+.lu-card {
+  display: inline-block;
+  width: 9px;
+  height: 13px;
+  border-radius: 2px;
+}
+
+.lu-card--yellow {
+  background: oklch(0.86 0.15 92);
+}
+
+.lu-card--red {
+  background: oklch(0.58 0.19 27);
+}
+
+/* second yellow: a yellow card with a red one peeking out behind */
+.lu-card-pair {
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 15px;
+}
+
+.lu-card-pair .lu-card {
+  position: absolute;
+}
+
+.lu-card-pair .lu-card--yellow {
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.lu-card-pair .lu-card--red {
+  left: 5px;
+  top: 2px;
+}
+
+.lu-bench__name-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lu-bench__name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* formation next to the team name in the legend, e.g. "4-3-3" */
+.lu-formation {
+  font-weight: 700;
+  color: var(--color-neutral-900);
+  font-variant-numeric: tabular-nums;
+}
+
+/* — clickable players (open the player panel) — */
+button.lu-player {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+button.lu-player:hover .lu-player__number {
+  box-shadow: 0 0 0 3px var(--color-accent-2-100), 0 0 0 5px var(--color-text);
+}
+
+button.lu-player:focus-visible {
+  outline: none;
+}
+
+button.lu-player:focus-visible .lu-player__number {
+  box-shadow: 0 0 0 3px var(--color-accent-2-100), 0 0 0 5px var(--color-text);
+}
+
+button.lu-bench__row {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.lu-bench__row:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: -2px;
+}
+
+/* — substitution badges: "↓ 64'" on the pitch, "↑ 64'" on the bench — */
+.lu-sub {
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* on the pitch it sits on the top-right edge of the shirt-number circle */
+.lu-sub--off {
+  position: absolute;
+  right: -22px;
+  top: -8px;
+  background: var(--color-bg);
+  color: var(--color-neutral-900);
+  box-shadow: var(--shadow-sm);
+}
+
+.lu-sub--on {
+  font-size: 12px;
+  padding: 3px 8px;
+}
+
+.lu-sub--on.lu-sub--home {
+  color: var(--color-accent-800);
+}
+
+.lu-sub--on.lu-sub--away {
+  color: var(--color-accent-2-800);
+}
+
+.lu-bench__when {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }

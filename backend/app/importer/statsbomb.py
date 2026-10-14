@@ -162,15 +162,22 @@ def import_lineups(session, match_id, events):
             session.merge(player_obj)
             session.flush()  # player must exist before its lineup row
 
-            positions = player["positions"]
+            # StatsBomb doesn't always list positions in time order (e.g. a late "Tactical
+            # Shift" can come before the substitution that brought the player on), so sort
+            # them by period, then time, before reading the first one.
+            positions = sorted(
+                player["positions"],
+                key=lambda pos: (pos["from_period"], to_minutes(pos["from"])),
+            )
             if positions:
-                first, last = positions[0], positions[-1]
+                first = positions[0]
                 start = to_minutes(first["from"])
-                # no "to" means until the final whistle; period 5 (penalties) restarts the clock
-                if last["to"] and last["to_period"] != 5:
-                    end = to_minutes(last["to"])
-                else:
+                # An open-ended position (no "to") means he was on the pitch at the final
+                # whistle; period 5 (penalties) restarts the clock, so treat it the same way.
+                if any(pos["to"] is None or pos["to_period"] == 5 for pos in positions):
                     end = match_end
+                else:  # came off: the latest time he left the pitch
+                    end = max(to_minutes(pos["to"]) for pos in positions)
                 minutes_played = round(end - start)
                 starter = first["start_reason"] == "Starting XI"
                 position = first["position"]
@@ -195,7 +202,13 @@ def import_lineups(session, match_id, events):
 
 # The type-specific data lives under a key named after the type ("Pass" -> "pass").
 # These two don't follow that rule.
-DETAIL_KEYS = {"Goal Keeper": "goalkeeper", "50/50": "50_50"}
+DETAIL_KEYS = {
+    "Goal Keeper": "goalkeeper",
+    "50/50": "50_50",
+    # Starting XI / Tactical Shift keep their data under "tactics" (formation + positions)
+    "Starting XI": "tactics",
+    "Tactical Shift": "tactics",
+}
 
 
 def get_detail_key(event_type):

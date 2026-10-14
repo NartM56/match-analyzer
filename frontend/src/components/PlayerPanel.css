@@ -1,0 +1,405 @@
+/* Player panel (drawer). Home = terracotta, away = dark olive, as everywhere else. */
+
+.pp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: flex-end;
+  background: color-mix(in srgb, var(--color-text) 35%, transparent);
+}
+
+.pp-drawer {
+  width: min(520px, 100%);
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-lg);
+  border-radius: 32px 0 0 32px;
+  animation: pp-slide 0.18s ease-out;
+}
+
+.pp-drawer--mobile {
+  border-radius: 0;
+}
+
+@keyframes pp-slide {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-drawer {
+    animation: none;
+  }
+}
+
+.pp-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.pp-team {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pp-message {
+  margin: 0;
+  color: var(--color-neutral-800);
+}
+
+.pp-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* — who the player is — */
+.pp-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pp-number {
+  width: 60px;
+  height: 60px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.pp-number--home {
+  background: var(--color-accent-700);
+}
+
+.pp-number--away {
+  background: var(--color-accent-2-800);
+}
+
+.pp-identity__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pp-identity__text h3 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.pp-identity__text span {
+  font-size: 14px;
+  color: var(--color-neutral-800);
+}
+
+/* — minutes / goals tiles — */
+.pp-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.pp-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  border-radius: 24px;
+  background: var(--color-surface);
+}
+
+.pp-tile span {
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pp-tile strong {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+/* — facts — */
+.pp-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 24px;
+  background: var(--color-surface);
+}
+
+.pp-fact {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 10px 12px;
+}
+
+.pp-fact__k {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pp-fact__v {
+  font-size: 14px;
+  text-align: right;
+  color: var(--color-neutral-900);
+}
+
+/* — maps — */
+.pp-maps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pp-maps__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pp-maps__head h4 {
+  margin: 0;
+}
+
+.pp-viz {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 28px;
+  background: var(--color-surface);
+}
+
+.pp-viz__stats {
+  display: flex;
+  gap: 12px;
+}
+
+.pp-viz__stats > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pp-viz__stats span {
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pp-viz__stats strong {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 22px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pp-viz__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pp-rank {
+  font-size: 12px;
+}
+
+.pp-pass-filter {
+  background: var(--color-bg);
+}
+
+.pp-pass-filter .seg-opt {
+  font-size: 12px;
+}
+
+.pp-viz__map {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pp-direction {
+  align-self: flex-end;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-neutral-800);
+}
+
+.pp-viz__frame {
+  position: relative;
+  width: 100%;
+}
+
+/* "No shots in this match" etc., over the empty pitch */
+.pp-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.pp-empty span {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pp-shot-detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: var(--color-bg);
+  font-size: 13px;
+}
+
+.pp-shot-detail strong {
+  font-size: 14px;
+}
+
+.pp-shot-detail span {
+  color: var(--color-neutral-900);
+}
+
+/* passes: team-coloured arrows for completed, grey dashed for incomplete */
+.pp-pass {
+  stroke-width: 0.45;
+  opacity: 0.85;
+}
+
+.pp-pass--home {
+  stroke: var(--color-accent-700);
+}
+
+.pp-pass--away {
+  stroke: var(--color-accent-2-800);
+}
+
+.pp-pass--miss {
+  stroke: var(--color-neutral-600);
+  stroke-width: 0.4;
+  stroke-dasharray: 1.2 0.9;
+  opacity: 0.75;
+}
+
+.pp-arrow--home {
+  fill: var(--color-accent-700);
+}
+
+.pp-arrow--away {
+  fill: var(--color-accent-2-800);
+}
+
+.pp-arrow--miss {
+  fill: var(--color-neutral-600);
+}
+
+/* touches heatmap */
+.pp-heat--home {
+  fill: var(--color-accent-700);
+}
+
+.pp-heat--away {
+  fill: var(--color-accent-2-800);
+}
+
+/* — legends under each map — */
+.pp-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--color-neutral-800);
+}
+
+.pp-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pp-key-line {
+  width: 22px;
+  border-top: 2.5px solid;
+}
+
+.pp-key-line--home {
+  border-top-color: var(--color-accent-700);
+}
+
+.pp-key-line--away {
+  border-top-color: var(--color-accent-2-800);
+}
+
+.pp-key-line--miss {
+  border-top: 2.5px dashed var(--color-neutral-600);
+}
+
+.pp-gradient {
+  width: 120px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.pp-gradient--home {
+  background: linear-gradient(90deg, var(--color-accent-2-100), var(--color-accent-700));
+}
+
+.pp-gradient--away {
+  background: linear-gradient(90deg, var(--color-accent-2-100), var(--color-accent-2-800));
+}
+
+/* — unused substitute — */
+.pp-did-not-play {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-6);
+  border-radius: 28px;
+  background: var(--color-surface);
+}
+
+.pp-did-not-play h5,
+.pp-did-not-play p {
+  margin: 0;
+}
+
+.pp-did-not-play p {
+  font-size: 13px;
+  color: var(--color-neutral-800);
+}
