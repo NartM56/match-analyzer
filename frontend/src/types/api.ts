@@ -289,3 +289,34 @@ export interface MatchPass {
   into_final_third: boolean;
   into_box: boolean;
 }
+
+// GET /matches/{id}/possession — each team's touches in 9 zones (3 thirds × 3 channels) and its
+// final-third entries and shots by channel, for the whole match ("all") and each period ("1", "2", and "et" only when there was extra time)
+export type Third = "defensive" | "middle" | "attacking";
+export type Channel = "left" | "centre" | "right"; // from the team's own point of view, attacking forward
+
+export interface AttackZone {
+  third: Third;
+  channel: Channel;
+  count: number;
+  pct: number; // share of that team's touches in the period
+}
+
+export interface AttackChannel {
+  channel: Channel;
+  entries: number; // completed passes from outside the final third into it, ending in this channel
+  shots: number; // shots taken from this channel
+  xg: number;
+}
+
+export interface TeamAttackZones {
+  team_id: number;
+  total: number; // touches
+  zones: AttackZone[]; // always 9, defensive-left first, attacking-right last
+  entries_total: number; // final-third entries
+  channels: AttackChannel[]; // left, centre, right
+}
+
+export type AttackPeriod = "all" | "1" | "2" | "et";
+
+export type MatchAttackZones = Partial<Record<AttackPeriod, { home: TeamAttackZones; away: TeamAttackZones }>>;

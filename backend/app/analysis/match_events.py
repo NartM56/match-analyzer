@@ -16,6 +16,9 @@ PERIOD_END = {1: 45, 2: 90, 3: 105, 4: 120}
 
 GOAL = (120, 40)
 
+THIRDS = ["defensive", "middle", "attacking"]
+CHANNELS = ["left", "centre", "right"]
+
 
 def minute_label(minute: int, period: int) -> str:
     """StatsBomb minutes count from 0 (22 = the 23rd minute); stoppage time shows as 45+3'."""
@@ -714,3 +717,88 @@ def get_player_events(db: Session, match: Match, player_id: int) -> dict:
         "maps": maps,
         "ranks": _team_ranks(db, match, lineup.team_id, player_id),
     }
+    
+def zone(x: float, y: float) -> tuple[str, str]:
+    third = "defensive" if x < 40 else "middle" if x < 80 else "attacking"
+    channel = "left" if y < 80 / 3 else "centre" if y < 160 / 3 else "right"
+    return third, channel
+    
+def _zone_counts(events: list[Event]) -> dict:
+    counts = {(third, channel): 0 for third in THIRDS for channel in CHANNELS}
+    for e in events:
+        third, channel = zone(e.x, e.y)
+        counts[(third, channel)] += 1
+    
+    total = sum(counts.values())
+    
+    return {
+        "total": total,
+        "zones": [
+            {
+                "third": third,
+                "channel": channel,
+                "count": n,
+                "pct": round(n / total * 100, 1) if total else 0
+            }
+            for (third, channel), n in counts.items()
+        ]
+        
+    }
+    
+# Which match periods each period filter covers (extra time = periods 3 and 4)
+PERIOD_FILTERS = {"all": (1, 2, 3, 4), "1": (1,), "2": (2,), "et": (3, 4)}
+
+
+def _channel_entries(events: list[Event]) -> dict:
+    """Final-third entries by channel: completed passes that start outside the final third (x < 80)
+    and end inside it, put in the channel they arrive in (end_y). Plus the shots taken from each
+    channel, so the frontend can say "12 entries · 3 shots · 0.45 xG"."""
+    entries = {channel: 0 for channel in CHANNELS}
+    shots = {channel: [] for channel in CHANNELS}
+    for e in events:
+        if e.event_type == "Pass" and e.outcome is None and e.end_x is not None and e.x < 80 <= e.end_x:
+            entries[zone(e.end_x, e.end_y)[1]] += 1
+        elif e.event_type == "Shot":
+            shots[zone(e.x, e.y)[1]].append((e.details or {}).get("statsbomb_xg", 0))
+    return {
+        "entries_total": sum(entries.values()),
+        "channels": [
+            {
+                "channel": channel,
+                "entries": entries[channel],
+                "shots": len(shots[channel]),
+                "xg": round(sum(shots[channel]), 2),
+            }
+            for channel in CHANNELS
+        ],
+    }
+
+
+def get_attack_area(db: Session, match: Match) -> dict:
+    """Where each team attacked, for the whole match and for each period (so the frontend can switch
+    periods without another request; extra time only when played):
+    - zones: touches in the 9 zones (3 thirds x 3 channels)
+    - channels: final-third entries and shots down the left, centre and right"""
+    events = db.scalars(select(Event).filter(Event.match_id == match.id)).all()
+
+    # everything with a location before the shootout; touches are counted from these
+    located = [e for e in events if e.period <= 4 and e.x is not None]
+    has_extra_time = any(e.period >= 3 for e in located)
+
+    def team_attack(team_id: int, covered: tuple[int, ...]) -> dict:
+        mine = [e for e in located if e.team_id == team_id and e.period in covered]
+        return {
+            "team_id": team_id,
+            **_zone_counts([e for e in mine if _is_touch(e)]),
+            **_channel_entries(mine),
+        }
+
+    periods = {}
+    for key, covered in PERIOD_FILTERS.items():
+        if key == "et" and not has_extra_time:
+            continue
+        periods[key] = {
+            "home": team_attack(match.home_team_id, covered),
+            "away": team_attack(match.away_team_id, covered),
+        }
+    return periods

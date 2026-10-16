@@ -9,11 +9,10 @@ type Status = "loading" | "ready" | "not-found" | "error";
 // Tab paths are relative to /matches/:matchId ("" = the Overview index route)
 const TABS = [
   { to: "", label: "Overview" },
+  { to: "lineups", label: "Lineups" },
   { to: "shots", label: "Shots" },
   { to: "passes", label: "Passing" },
   { to: "attack", label: "Attack" },
-  { to: "lineups", label: "Lineups" },
-  { to: "stats", label: "Players" },
 ];
 
 // Groups one team's goals by player: "Lionel Messi 23' (pen), 108'"

@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.analysis.match_events import get_goals, get_passes, get_penalties, get_periods, get_shootout, get_timeline, get_xg, get_lineups, get_player_events
+from app.analysis.match_events import get_goals, get_passes, get_penalties, get_periods, get_shootout, get_timeline, get_xg, get_lineups, get_player_events, get_attack_area
 from app.analysis.team_stats import get_match_team_stats
 
 from app.db.database import get_db
@@ -272,3 +272,8 @@ class PassOut(BaseModel):
 def get_match_passes(match_id: int, player_id: int | None = None, db: Session = Depends(get_db)):
     match = _get_match_or_404(db, match_id)
     return get_passes(db, match, player_id)
+
+@router.get("/{match_id}/possession")
+def get_match_possession(match_id: int, db: Session = Depends(get_db)):
+    match = _get_match_or_404(db, match_id)
+    return get_attack_area(db, match)
