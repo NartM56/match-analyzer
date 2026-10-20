@@ -79,12 +79,12 @@
 }
 
 .lu-pitch__grass {
-  fill: var(--color-accent-2-100);
+  fill: var(--color-pitch-100);
 }
 
 .lu-pitch__lines {
   fill: none;
-  stroke: var(--color-accent-2-300);
+  stroke: var(--color-pitch-300);
   stroke-width: 0.5;
 }
 
@@ -109,7 +109,7 @@
   font-weight: 700;
   font-size: 14px;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 0 0 3px var(--color-accent-2-100), var(--shadow-sm);
+  box-shadow: 0 0 0 3px var(--color-pitch-100), var(--shadow-sm);
 }
 
 .lu-player__number--home {
@@ -392,7 +392,7 @@ button.lu-player {
 }
 
 button.lu-player:hover .lu-player__number {
-  box-shadow: 0 0 0 3px var(--color-accent-2-100), 0 0 0 5px var(--color-text);
+  box-shadow: 0 0 0 3px var(--color-pitch-100), 0 0 0 5px var(--color-text);
 }
 
 button.lu-player:focus-visible {
@@ -400,7 +400,7 @@ button.lu-player:focus-visible {
 }
 
 button.lu-player:focus-visible .lu-player__number {
-  box-shadow: 0 0 0 3px var(--color-accent-2-100), 0 0 0 5px var(--color-text);
+  box-shadow: 0 0 0 3px var(--color-pitch-100), 0 0 0 5px var(--color-text);
 }
 
 button.lu-bench__row {

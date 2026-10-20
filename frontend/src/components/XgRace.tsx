@@ -179,8 +179,7 @@ export function XgRace({ match, shared = false }: { match: MatchDetail; shared?:
         </div>
       </div>
       <p className="xg-note">
-        Running total of expected goals (xG) from every shot. Dots are goals; shootout penalties
-        aren't counted.
+        Running total of expected goals (xG) from every shot. Dots are goals; shootout penalties aren't counted.
       </p>
       {chart}
     </section>

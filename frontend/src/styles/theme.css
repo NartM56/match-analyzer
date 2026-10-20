@@ -1,0 +1,48 @@
+/* PlayIQ colour theme, loaded after organic.css (see main.jsx) so these values win.
+   organic.css stays a copy of the design system; the app's palette is chosen here.
+   To go back to the design system's own colours, remove the theme.css import in main.jsx.
+
+   Current theme: "Navy & Brick" (classic football programme).
+   - accent   = home team, buttons and selected states: brick red
+   - accent-2 = away team: deep navy
+   - pitch    = grass, markings and zone edges, kept separate from both teams so changing
+                a team colour never recolours the pitch */
+
+:root {
+  --color-bg: #f4efe6; /* warm paper */
+  --color-surface: #e8e0d2;
+  --color-text: #1c1f2a;
+  --color-divider: color-mix(in srgb, #1c1f2a 16%, transparent);
+
+  --color-accent: #b0473a;
+  --color-accent-100: #fbefec;
+  --color-accent-200: #f6d9d2;
+  --color-accent-300: #ebb5a8;
+  --color-accent-400: #d98a78;
+  --color-accent-500: #c4624f;
+  --color-accent-600: #ad4a38;
+  --color-accent-700: #8f3628; /* white text sits on this */
+  --color-accent-800: #67261c;
+  --color-accent-900: #401813;
+
+  --color-accent-2: #47658d;
+  --color-accent-2-100: #eef2f8;
+  --color-accent-2-200: #d8e1ee;
+  --color-accent-2-300: #b5c5dc;
+  --color-accent-2-400: #8aa2c3;
+  --color-accent-2-500: #6582a8;
+  --color-accent-2-600: #47658d;
+  --color-accent-2-700: #2f4c72;
+  --color-accent-2-800: #1f3a5f; /* the away colour; white text sits on this */
+  --color-accent-2-900: #13243d;
+
+  --color-pitch-100: #e6efdc; /* grass */
+  --color-pitch-300: #c5d4b4; /* markings */
+  --color-pitch-400: #aebf9a; /* zone edges */
+
+  /* results and "better / worse" changes, separate from the team colours */
+  --color-positive-200: #d6efdc;
+  --color-positive-900: #1d5c2e;
+  --color-negative-200: #f7d9d7;
+  --color-negative-900: #7a1f1d;
+}

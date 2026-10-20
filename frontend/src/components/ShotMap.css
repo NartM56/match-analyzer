@@ -15,17 +15,17 @@
 }
 
 .sm-grass {
-  fill: var(--color-accent-2-100);
+  fill: var(--color-pitch-100);
 }
 
 .sm-lines {
   fill: none;
-  stroke: var(--color-accent-2-300);
+  stroke: var(--color-pitch-300);
   stroke-width: 0.5;
 }
 
 .sm-lines__spot {
-  fill: var(--color-accent-2-300);
+  fill: var(--color-pitch-300);
   stroke: none;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .sm-shot--blocked rect {
-  fill: var(--color-accent-2-100);
+  fill: var(--color-pitch-100);
   stroke: var(--sm-team);
   stroke-width: 0.8;
 }

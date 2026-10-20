@@ -1,0 +1,61 @@
+{
+  "built_on": "2026-10-19",
+  "performances": 128,
+  "stats": {
+    "xg": {
+      "p10": 0.294,
+      "median": 0.98,
+      "p90": 2.159
+    },
+    "shots_on_target": {
+      "p10": 0.93,
+      "median": 2.885,
+      "p90": 7.218
+    },
+    "big_chances": {
+      "p10": 0.0,
+      "median": 0.9,
+      "p90": 1.88
+    },
+    "xg_against": {
+      "p10": 0.294,
+      "median": 0.98,
+      "p90": 2.159
+    },
+    "shots_on_target_against": {
+      "p10": 0.93,
+      "median": 2.885,
+      "p90": 7.218
+    },
+    "big_chances_against": {
+      "p10": 0.0,
+      "median": 0.9,
+      "p90": 1.88
+    },
+    "possession": {
+      "p10": 37.09,
+      "median": 50.0,
+      "p90": 62.91
+    },
+    "pass_accuracy": {
+      "p10": 73.66,
+      "median": 82.55,
+      "p90": 87.23
+    },
+    "progressive_passes": {
+      "p10": 15.115,
+      "median": 28.01,
+      "p90": 40.925
+    },
+    "attacking_third_pct": {
+      "p10": 15.42,
+      "median": 23.35,
+      "p90": 29.72
+    },
+    "final_third_entries": {
+      "p10": 14.894,
+      "median": 27.355,
+      "p90": 45.282
+    }
+  }
+}

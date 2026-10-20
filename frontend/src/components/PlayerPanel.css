@@ -6,7 +6,7 @@
   z-index: 60;
   display: flex;
   justify-content: flex-end;
-  background: color-mix(in srgb, var(--color-text) 35%, transparent);
+  background: color-mix(in srgb, var(--color-backdrop, var(--color-text)) 35%, transparent);
 }
 
 .pp-drawer {
@@ -377,11 +377,11 @@
 }
 
 .pp-gradient--home {
-  background: linear-gradient(90deg, var(--color-accent-2-100), var(--color-accent-700));
+  background: linear-gradient(90deg, var(--color-pitch-100), var(--color-accent-700));
 }
 
 .pp-gradient--away {
-  background: linear-gradient(90deg, var(--color-accent-2-100), var(--color-accent-2-800));
+  background: linear-gradient(90deg, var(--color-pitch-100), var(--color-accent-2-800));
 }
 
 /* — unused substitute — */

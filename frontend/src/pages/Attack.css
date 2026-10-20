@@ -200,7 +200,7 @@
   aspect-ratio: 2 / 3;
   border-radius: 14px;
   overflow: hidden;
-  background: var(--color-accent-2-100);
+  background: var(--color-pitch-100);
 }
 
 .at-field__marks {
@@ -223,7 +223,7 @@
   align-items: center;
   justify-content: center;
   background: color-mix(in srgb, var(--at-zone) var(--at-a), transparent);
-  box-shadow: inset 0 0 0 0.75px var(--color-accent-2-400);
+  box-shadow: inset 0 0 0 0.75px var(--color-pitch-400);
   color: var(--color-text);
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
@@ -263,7 +263,7 @@
   width: 96px;
   height: 10px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-accent-2-100), var(--color-neutral-700));
+  background: linear-gradient(90deg, var(--color-pitch-100), var(--color-neutral-700));
 }
 
 .at-legend__busiest {

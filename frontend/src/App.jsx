@@ -7,6 +7,7 @@ import Shots from "./pages/Shots";
 import Attack from "./pages/Attack";
 import Passes from "./pages/Passes";
 import Lineups from "./pages/Lineups";
+import Compare from "./pages/Compare";
 import "./App.css";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
       <main className="app-main">
         <Routes>
           <Route path="/" element={<MatchSelection />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="/matches/:matchId" element={<Score />}>
             <Route index element={<Overview />} />
             <Route path="lineups" element={<Lineups />} />

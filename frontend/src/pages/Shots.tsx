@@ -239,7 +239,7 @@ export function Shots() {
               );
             })}
             <span className="sh-caption">
-              Goal at the top · bigger marker = higher xG · hover, tap or tab to a shot. Shootout penalties aren't included.
+              Bigger marker = higher xG. Shootout penalties aren't included.
             </span>
           </div>
 

@@ -26,6 +26,7 @@ export interface Match {
   competition_stage: string | null;
   match_week: number | null;
   group_name: string | null;
+  penalties: { home: number; away: number } | null; // shootout score, only when there was one
 }
 
 // GET /matches/{id} — the match header shown above every match tab
@@ -320,3 +321,47 @@ export interface TeamAttackZones {
 export type AttackPeriod = "all" | "1" | "2" | "et";
 
 export type MatchAttackZones = Partial<Record<AttackPeriod, { home: TeamAttackZones; away: TeamAttackZones }>>;
+
+// GET /compare?team=&a=&b= — one team in two of its matches
+export interface ScorePart {
+  name: string; // "Chance creation", "Defending", "Result", "Control", "Territory"
+  points: number;
+  max: number;
+}
+
+export interface CompareSide {
+  match_id: number;
+  team_id: number;
+  opponent_id: number;
+  opponent_name: string;
+  is_home: boolean;
+  match_date: string; // "2022-12-18"
+  competition_stage: string | null;
+  group_name: string | null; // "C" for group games
+  minutes: number; // match length incl. stoppage time
+  extra_time: boolean;
+  result: "W" | "D" | "L"; // over 90 or 120 minutes (a shootout is a draw)
+  penalties: { for: number; against: number } | null;
+  stats: Record<string, number>; // totals: goals_for, xg, xg_against, shots, possession, ...
+  stats_per_90: Record<string, number>;
+  score: { total: number; band: string; parts: ScorePart[] };
+  opponent_strength: { xg_difference: number; rank: number; teams: number } | null;
+}
+
+export interface KeyDifference {
+  part: string;
+  better: "A" | "B";
+  points_gap: number;
+  text: string;
+  values: { a: string; b: string };
+  unit: string;
+}
+
+export interface Comparison {
+  team_id: number;
+  team_name: string;
+  a: CompareSide;
+  b: CompareSide;
+  verdict: { better: "A" | "B" | null; points_gap: number };
+  key_differences: KeyDifference[];
+}

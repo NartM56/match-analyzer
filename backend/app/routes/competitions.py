@@ -3,11 +3,11 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, aliased
 
 from app.db.database import get_db
-from app.models.models import League, Match, Season, Team
+from app.models.models import Event, League, Match, Season, Team
 
 router = APIRouter()
 
@@ -29,6 +29,11 @@ class SeasonOut(BaseModel):
     year: str
 
 
+class ShootoutOut(BaseModel):
+    home: int
+    away: int
+
+
 class MatchSummaryOut(BaseModel):
     id: int
     match_date: date
@@ -42,6 +47,7 @@ class MatchSummaryOut(BaseModel):
     competition_stage: Optional[str]
     match_week: Optional[int]
     group_name: Optional[str]
+    penalties: Optional[ShootoutOut] = None  # shootout score, only for matches decided on penalties
 
 
 @router.get("", response_model=list[CompetitionOut])
@@ -91,6 +97,24 @@ def get_season_matches(competition_id: int, season_id: int, db: Session = Depend
         .order_by(Match.match_date, Match.kick_off)
     ).all()
 
+    # shootout goals per match and team, in one query for the whole season (period 5 = shootout)
+    shootout_rows = db.execute(
+        select(Event.match_id, Event.team_id, func.count())
+        .join(Match, Match.id == Event.match_id)
+        .where(Match.league_id == competition_id, Match.season_id == season_id,
+               Event.period == 5, Event.event_type == "Shot", Event.outcome == "Goal")
+        .group_by(Event.match_id, Event.team_id)
+    ).all()
+    shootout_goals: dict[int, dict[int, int]] = {}
+    for match_id, team_id, goals in shootout_rows:
+        shootout_goals.setdefault(match_id, {})[team_id] = goals
+
+    def penalties(match: Match) -> Optional[ShootoutOut]:
+        goals = shootout_goals.get(match.id)
+        if goals is None:
+            return None
+        return ShootoutOut(home=goals.get(match.home_team_id, 0), away=goals.get(match.away_team_id, 0))
+
     return [
         MatchSummaryOut(
             id=match.id,
@@ -105,6 +129,7 @@ def get_season_matches(competition_id: int, season_id: int, db: Session = Depend
             competition_stage=match.competition_stage,
             match_week=match.match_week,
             group_name=match.group_name,
+            penalties=penalties(match),
         )
         for match, home_team_name, away_team_name in rows
     ]

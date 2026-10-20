@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* PlayIQ theme: "Midnight Blue + Electric Cyan" (dark). Loaded after theme.css in main.jsx, so it
+   overrides the Navy & Brick values. Switch themes by changing which theme-*.css main.jsx imports.
+
+   The scales keep the same meaning as in the other themes, so the pages need no changes:
+   - 100-300: subtle fills (tags, pills, "behind" bars) → dark tints here
+   - 600-800: the team colour for lines, dots, text and fills behind white numbers → bright here
+   - 900:     text on top of a 100-200 fill → light here
+   Home = electric cyan, away = amber (a warm colour stands out from cyan and from the blue page,
+   and blue vs orange is the pair colour-blind viewers tell apart most easily). */
+
+:root {
+  --color-bg: #0a1020;
+  --color-surface: #151f35;
+  --color-text: #eaf2ff;
+  --color-divider: color-mix(in srgb, #eaf2ff 14%, transparent);
+  --color-backdrop: #000; /* behind the player panel */
+
+  /* blue-tinted greys, flipped: low numbers are dark, high numbers are light (800 = muted text) */
+  --color-neutral-100: #0e1628;
+  --color-neutral-200: #1a2540;
+  --color-neutral-300: #24304b;
+  --color-neutral-400: #2f3c59;
+  --color-neutral-500: #46546f;
+  --color-neutral-600: #5f6d86;
+  --color-neutral-700: #717f98;
+  --color-neutral-800: #8190a8;
+  --color-neutral-900: #b7c3d6;
+
+  /* home: electric cyan */
+  --color-accent: #38bdf8;
+  --color-accent-100: #0c2233;
+  --color-accent-200: #0f2f47;
+  --color-accent-300: #145073;
+  --color-accent-400: #1b7bb0;
+  --color-accent-500: #2aa3df;
+  --color-accent-600: #38bdf8;
+  --color-accent-700: #2aa8e6;
+  --color-accent-800: #1c93d0; /* a touch deeper so white numbers on it stay readable */
+  --color-accent-900: #b9e8fd;
+
+  /* away: amber */
+  --color-accent-2: #f5a524;
+  --color-accent-2-100: #2a1f0a;
+  --color-accent-2-200: #3a2b0d;
+  --color-accent-2-300: #5e4410;
+  --color-accent-2-400: #946a14;
+  --color-accent-2-500: #d18f1a;
+  --color-accent-2-600: #f5a524;
+  --color-accent-2-700: #d98612;
+  --color-accent-2-800: #c77a0a; /* deeper amber so white numbers on it stay readable */
+  --color-accent-2-900: #fde3b0;
+
+  /* a deep green pitch that sits into the midnight page */
+  --color-pitch-100: #11241f;
+  --color-pitch-300: #24433a;
+  --color-pitch-400: #2c5044;
+
+  /* fonts: Space Grotesk for headings and the big numbers (clear, even digits), Inter for everything else */
+  --font-heading: "Space Grotesk", system-ui, sans-serif;
+  --font-heading-weight: 700;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* results and "better / worse" changes, separate from the team colours */
+  --color-positive-200: #16301f;
+  --color-positive-900: #8fe0a9;
+  --color-negative-200: #3a1818;
+  --color-negative-900: #ff9b97;
+
+  color-scheme: dark; /* dark scrollbars and form controls */
+}

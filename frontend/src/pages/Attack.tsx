@@ -351,9 +351,8 @@ export function Attack() {
       </div>
 
       <p className="at-note">
-        Channels split the pitch's width into thirds and are named from the attacking team's point of view. Zones count touches (every time a
-        player played the ball). A final-third entry is a completed pass that starts outside the final third and ends inside it. Shootout
-        penalties aren't included.
+        Left and right are from the attacking team's point of view. A final-third entry is a completed pass from outside the final third into
+        it.
       </p>
     </div>
   );

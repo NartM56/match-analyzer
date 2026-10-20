@@ -93,7 +93,6 @@ export function Passes() {
       <div className="pa-page" aria-busy="true" aria-label="Loading passing data">
         <span className="skeleton-bar" style={{ width: "100%", height: 460 }} />
         <span className="skeleton-bar" style={{ width: "100%", height: 460 }} />
-        <span className="pa-note">Loading every pass for this match…</span>
       </div>
     );
   }
@@ -384,8 +383,7 @@ export function Passes() {
               </PassPitch>
             </div>
             <span className="pa-note">
-              Each circle sits at the player's average pass position; bigger circle = more passes, thicker line = more passes between the
-              pair. Hover, tap or tab to a player.
+              Circles sit at each player's average pass position. Bigger circle = more passes; thicker line = more passes between the pair.
             </span>
           </div>
 

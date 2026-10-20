@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@500;600;700&display=swap');
+
+/* PlayIQ theme: "Charcoal + Matchday Orange" (dark). Loaded after theme.css in main.jsx, so it
+   overrides the Navy & Brick values. To go back to Navy & Brick, remove its import in main.jsx.
+
+   The scales keep the same meaning as in the light themes, so the pages need no changes:
+   - 100-300: subtle fills (tags, pills, "behind" bars) → dark tints here
+   - 600-800: the team colour for lines, dots, text and fills behind white numbers → bright here
+   - 900:     text on top of a 100-200 fill → light here
+   Home = matchday orange, away = sky blue (navy would disappear on charcoal; orange vs blue is
+   also the pair colour-blind viewers tell apart most easily). */
+
+:root {
+  --color-bg: #141414;
+  --color-surface: #222222;
+  --color-text: #f5f5f5;
+  --color-divider: color-mix(in srgb, #f5f5f5 14%, transparent);
+  --color-backdrop: #000; /* behind the player panel */
+
+  /* greys flipped: low numbers are dark, high numbers are light (800 = muted text) */
+  --color-neutral-100: #1b1b1b;
+  --color-neutral-200: #2c2c2c;
+  --color-neutral-300: #383838;
+  --color-neutral-400: #474747;
+  --color-neutral-500: #5c5c5c;
+  --color-neutral-600: #737373;
+  --color-neutral-700: #8f8f8f;
+  --color-neutral-800: #a3a3a3;
+  --color-neutral-900: #d4d4d4;
+
+  /* home: matchday orange */
+  --color-accent: #ff7a30;
+  --color-accent-100: #2b1a10;
+  --color-accent-200: #3d2414;
+  --color-accent-300: #6a3517;
+  --color-accent-400: #a34c1c;
+  --color-accent-500: #e0661f;
+  --color-accent-600: #ff7a30;
+  --color-accent-700: #f26d22;
+  --color-accent-800: #e0601c;
+  --color-accent-900: #ffc29e;
+
+  /* away: sky blue */
+  --color-accent-2: #6cb0ea;
+  --color-accent-2-100: #14212e;
+  --color-accent-2-200: #1b2f42;
+  --color-accent-2-300: #2c4a68;
+  --color-accent-2-400: #3f6a94;
+  --color-accent-2-500: #4f86bd;
+  --color-accent-2-600: #6cb0ea;
+  --color-accent-2-700: #5aa3e2;
+  --color-accent-2-800: #4593d6;
+  --color-accent-2-900: #c4e0f7;
+
+  /* a dark green pitch, so it doesn't glow on a charcoal page */
+  --color-pitch-100: #1b2620;
+  --color-pitch-300: #34473b;
+  --color-pitch-400: #3e5446;
+
+  /* fonts: Barlow Condensed for headings and the big numbers (tall and narrow, like a stadium
+     scoreboard), Barlow (its regular-width sibling) for everything else */
+  --font-heading: "Barlow Condensed", system-ui, sans-serif;
+  --font-heading-weight: 700;
+  --font-body: "Barlow", system-ui, sans-serif;
+
+  /* results and "better / worse" changes, separate from the team colours */
+  --color-positive-200: #16301f;
+  --color-positive-900: #8fe0a9;
+  --color-negative-200: #3a1818;
+  --color-negative-900: #ff9b97;
+
+  color-scheme: dark; /* dark scrollbars and form controls */
+}

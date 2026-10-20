@@ -184,7 +184,7 @@
 
 .pa-node__circle {
   fill: var(--pa-team);
-  stroke: var(--color-accent-2-100);
+  stroke: var(--color-pitch-100);
   stroke-width: 0.6;
 }
 
@@ -205,7 +205,7 @@
 
 .pa-node__name {
   fill: var(--color-text);
-  stroke: var(--color-accent-2-100);
+  stroke: var(--color-pitch-100);
   paint-order: stroke;
   font-family: var(--font-body);
   font-weight: 600;

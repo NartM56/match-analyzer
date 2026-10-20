@@ -371,9 +371,8 @@ export function Overview() {
         )}
 
         <p className="overview-card__note">
-          The leading team's figure is highlighted; fouls and cards aren't
-          scored either way. Possession is a PlayIQ estimate: each team's share
-          of time on the ball, worked out from event timestamps.
+          Possession is a PlayIQ estimate: each team's share of time on the
+          ball, worked out from event timestamps.
         </p>
       </section>
       <AiSummary matchId={match.id} />
