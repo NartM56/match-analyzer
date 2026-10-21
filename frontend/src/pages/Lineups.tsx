@@ -226,8 +226,6 @@ export function Lineups() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setLineups(null);
-    setFailed(false);
     fetch(`/api/matches/${match.id}/lineups`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Failed to load lineups (${response.status})`);
@@ -237,7 +235,12 @@ export function Lineups() {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setLineups(null);
+      setFailed(false);
+    };
   }, [match.id]);
 
   if (failed) {

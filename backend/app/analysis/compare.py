@@ -115,7 +115,9 @@ def get_team_match_summary(db: Session, match: Match, team_id: int) -> dict:
             "possession": mine["possession"],
             "passes": mine["passes"],
             "pass_accuracy": mine["pass_accuracy"],
-            "attacking_third_pct": round(attacking_touches / my_attack["total"] * 100, 1) if my_attack["total"] else 0.0,
+            "attacking_third_pct": (
+                round(attacking_touches / my_attack["total"] * 100, 1) if my_attack["total"] else 0.0
+            ),
             "corners": mine["corners"],
             "fouls": mine["fouls"],
             "yellow_cards": mine["yellow_cards"],
@@ -232,7 +234,11 @@ def _result_text(side: dict) -> str:
     """'a 3-3 draw with France (won 4-2 on penalties)', 'a 1-2 defeat to Saudi Arabia', ..."""
     gf, ga = side["stats"]["goals_for"], side["stats"]["goals_against"]
     opp = side["opponent_name"]
-    text = {"W": f"a {gf}-{ga} win over {opp}", "D": f"a {gf}-{ga} draw with {opp}", "L": f"a {gf}-{ga} defeat to {opp}"}[side["result"]]
+    text = {
+        "W": f"a {gf}-{ga} win over {opp}",
+        "D": f"a {gf}-{ga} draw with {opp}",
+        "L": f"a {gf}-{ga} defeat to {opp}",
+    }[side["result"]]
     pens = side["penalties"]
     if pens:
         won = pens["for"] > pens["against"]
@@ -248,23 +254,26 @@ def _difference_text(part: str, winner: dict, loser: dict, letter: str) -> str:
                 f"{w90['shots_on_target']:.1f} shots on target per 90, against {l90['xg']:.2f} and "
                 f"{l90['shots_on_target']:.1f} versus {loser['opponent_name']}.")
     if part == "Defending":
-        return (f"Gave away less in Match {letter}: {winner['opponent_name']} made {w90['xg_against']:.2f} xG per 90, "
-                f"{loser['opponent_name']} made {l90['xg_against']:.2f}.")
+        return (f"Gave away less in Match {letter}: {winner['opponent_name']} made "
+                f"{w90['xg_against']:.2f} xG per 90, {loser['opponent_name']} made {l90['xg_against']:.2f}.")
     if part == "Result":
         text = _result_text(winner)
-        return f"{text[0].upper()}{text[1:]}, against {_result_text(loser)}."  # not .capitalize(): it lowercases team names
+        # not .capitalize(): it lowercases team names
+        return f"{text[0].upper()}{text[1:]}, against {_result_text(loser)}."
     if part == "Control":
         return (f"Had more control against {winner['opponent_name']}: {w90['possession']:.0f}% possession and "
-                f"{w90['pass_accuracy']:.0f}% pass accuracy, against {l90['possession']:.0f}% and {l90['pass_accuracy']:.0f}%.")
-    return (f"Played further up the pitch against {winner['opponent_name']}: {w90['attacking_third_pct']:.0f}% of touches "
-            f"in the attacking third and {w90['final_third_entries']:.1f} final-third entries per 90.")
+                f"{w90['pass_accuracy']:.0f}% pass accuracy, against {l90['possession']:.0f}% and "
+                f"{l90['pass_accuracy']:.0f}%.")
+    return (f"Played further up the pitch against {winner['opponent_name']}: "
+            f"{w90['attacking_third_pct']:.0f}% of touches in the attacking third and "
+            f"{w90['final_third_entries']:.1f} final-third entries per 90.")
 
 
 def key_differences(a: dict, b: dict, limit: int = 3) -> list[dict]:
     """The parts of the score with the biggest gap between match A and match B, biggest first.
     a and b are the sides built in get_comparison (summary + stats_per_90 + score)."""
     diffs = []
-    for part_a, part_b in zip(a["score"]["parts"], b["score"]["parts"]):
+    for part_a, part_b in zip(a["score"]["parts"], b["score"]["parts"], strict=True):
         gap = round(part_a["points"] - part_b["points"], 1)
         if gap == 0:
             continue

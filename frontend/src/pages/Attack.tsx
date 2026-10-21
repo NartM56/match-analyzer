@@ -138,8 +138,6 @@ export function Attack() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setData(null);
-    setFailed(false);
     fetch(`/api/matches/${match.id}/possession`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Failed to load attack zones (${response.status})`);
@@ -149,7 +147,12 @@ export function Attack() {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setData(null);
+      setFailed(false);
+    };
   }, [match.id]);
 
   if (failed) {

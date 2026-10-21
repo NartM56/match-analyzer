@@ -5,14 +5,23 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.analysis.match_events import get_goals, get_passes, get_penalties, get_periods, get_shootout, get_timeline, get_xg, get_lineups, get_player_events, get_attack_area
+from app.analysis.ai_summary import PROMPT_VERSION, build_ai_summary
+from app.analysis.match_events import (
+    get_attack_area,
+    get_goals,
+    get_lineups,
+    get_passes,
+    get_penalties,
+    get_periods,
+    get_player_events,
+    get_shootout,
+    get_timeline,
+    get_xg,
+)
 from app.analysis.team_stats import get_match_team_stats
-
+from app.core.config import settings
 from app.db.database import get_db
 from app.models.models import League, Lineup, Match, MatchSummary, Season, Team
-from app.analysis.ai_summary import PROMPT_VERSION, build_ai_summary
-from app.core.config import settings
-
 
 router = APIRouter()
 

@@ -10,8 +10,6 @@ export function Shootout({ match }: { match: MatchDetail }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    setData(null);
-    setFailed(false);
     fetch(`/api/matches/${match.id}/shootout`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Failed to load shootout (${response.status})`);
@@ -21,7 +19,12 @@ export function Shootout({ match }: { match: MatchDetail }) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setData(null);
+      setFailed(false);
+    };
   }, [match.id]);
 
   const nameOf = (teamId: number) => (teamId === match.home_team.id ? match.home_team.name : match.away_team.name);

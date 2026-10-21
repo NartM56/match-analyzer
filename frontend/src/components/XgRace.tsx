@@ -48,8 +48,6 @@ export function XgRace({ match, shared = false }: { match: MatchDetail; shared?:
 
   useEffect(() => {
     const controller = new AbortController();
-    setData(null);
-    setFailed(false);
     fetch(`/api/matches/${match.id}/xg`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Failed to load xG (${response.status})`);
@@ -59,7 +57,12 @@ export function XgRace({ match, shared = false }: { match: MatchDetail; shared?:
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setData(null);
+      setFailed(false);
+    };
   }, [match.id]);
 
   const teams: { side: Side; id: number; name: string }[] = [

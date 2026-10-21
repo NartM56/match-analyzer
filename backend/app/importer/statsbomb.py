@@ -3,8 +3,8 @@ import uuid
 from datetime import date
 from pathlib import Path
 
-from app.models.models import Event, League, Lineup, Season, Team, Match, Player
 from app.db.database import SessionLocal
+from app.models.models import Event, League, Lineup, Match, Player, Season, Team
 
 DATA_DIR = Path(__file__).resolve().parents[3] / "data-sample"
 

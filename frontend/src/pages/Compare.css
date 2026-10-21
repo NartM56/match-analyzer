@@ -136,10 +136,30 @@
 }
 
 .cp-field {
+  position: relative; /* anchors the chevron */
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+}
+
+/* Our own chevron instead of the browser's, which sits right against the rounded edge.
+   It's a mask filled with the text colour, so it follows the theme. */
+.cp-field::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  bottom: 16px; /* centred in the 44px-high select */
+  width: 12px;
+  height: 12px;
+  background: var(--color-text);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  pointer-events: none; /* clicks go through to the select */
+}
+
+.cp-field:has(select:disabled)::after {
+  opacity: 0.35;
 }
 
 .cp-field__label {
@@ -153,7 +173,17 @@
 .cp-field .input {
   width: 100%;
   min-height: 44px;
+  padding-right: 44px; /* room for the chevron, so long match names don't run under it */
   background: var(--color-bg);
+  appearance: none; /* hide the browser's own arrow */
+  -webkit-appearance: none;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.cp-field .input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .cp-swap {
@@ -760,4 +790,25 @@
     grid-column: 2 / -1;
     margin-top: -4px;
   }
+}
+
+/* shown until a team and both matches are chosen */
+.cp-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 28px;
+  border-radius: 32px;
+  border: 2px dashed var(--color-neutral-300);
+}
+
+.cp-empty h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.cp-empty p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-neutral-800);
 }

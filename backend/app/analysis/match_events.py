@@ -8,8 +8,8 @@ import uuid
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models.models import Event, Lineup, Match, Player
 from app.analysis.team_stats import ON_TARGET
+from app.models.models import Event, Lineup, Match, Player
 
 # minute at which each period's normal time ends; anything later is stoppage time
 PERIOD_END = {1: 45, 2: 90, 3: 105, 4: 120}
@@ -358,9 +358,15 @@ def _sub_facts(player_id: int, came_off: dict, came_on: dict) -> dict:
     off, on = came_off.get(player_id), came_on.get(player_id)
     return {
         # e.g. Di María: off at 64', replaced by Marcos Acuña
-        "subbed_off": {"minute_label": off["minute_label"], "replaced_by": off["player_on"], "reason": off["reason"]} if off else None,
+        "subbed_off": (
+            {"minute_label": off["minute_label"], "replaced_by": off["player_on"], "reason": off["reason"]}
+            if off else None
+        ),
         # e.g. Acuña: on at 64', for Ángel Di María
-        "subbed_on": {"minute_label": on["minute_label"], "replaced": on["player_off"], "reason": on["reason"]} if on else None,
+        "subbed_on": (
+            {"minute_label": on["minute_label"], "replaced": on["player_off"], "reason": on["reason"]}
+            if on else None
+        ),
     }
 
 

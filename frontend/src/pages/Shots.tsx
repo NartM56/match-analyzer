@@ -3,7 +3,8 @@ import { useOutletContext, useSearchParams } from "react-router-dom";
 import type { MatchDetail, MatchXg, XgShot } from "../types/api";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { teamCode } from "../utils/format";
-import { HalfPitchShots, KIND_LABEL, ShotIcon, shotKind, type ShotKind, type Side } from "../components/ShotMap";
+import { HalfPitchShots, ShotIcon, type Side } from "../components/ShotMap";
+import { KIND_LABEL, shotKind, type ShotKind } from "../components/shotKind";
 import { PlayerPanel } from "../components/PlayerPanel";
 import "./Shots.css";
 
@@ -59,8 +60,6 @@ export function Shots() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setData(null);
-    setFailed(false);
     fetch(`/api/matches/${match.id}/xg`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Failed to load shots (${response.status})`);
@@ -70,7 +69,12 @@ export function Shots() {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setData(null);
+      setFailed(false);
+    };
   }, [match.id]);
 
   if (failed) {

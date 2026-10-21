@@ -8,7 +8,6 @@ from app.analysis.compare import get_comparison
 from app.db.database import get_db
 from app.routes.matches import _get_match_or_404
 
-
 router = APIRouter()
 
 
@@ -87,4 +86,4 @@ def compare_matches(team: int, a: int, b: int, db: Session = Depends(get_db)):
     try:
         return get_comparison(db, match_a, match_b, team)
     except ValueError as err:  # the team didn't play in one of the matches
-        raise HTTPException(status_code=400, detail=str(err))
+        raise HTTPException(status_code=400, detail=str(err)) from err

@@ -41,14 +41,16 @@ export function Score() {
 
   useEffect(() => {
     const controller = new AbortController();
-    setStats(null); // clear the previous match's stats
     fetch(`/api/matches/${matchId}/team_stats`, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
       .then(setStats)
       .catch((err) => {
         if (err?.name !== "AbortError") console.error(err);
       });
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      setStats(null); // clear this match's stats when moving to another
+    };
   }, [matchId]); // runs once per match, not per tab
 
   useEffect(() => {

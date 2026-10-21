@@ -1,3 +1,5 @@
+from itertools import pairwise
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -88,7 +90,7 @@ def _possession_seconds(events: list[Event]) -> dict[int, int]:
         (e for e in events if e.period in IN_PLAY_PERIODS and e.possession_team_id),
         key=lambda e: (e.period, e.minute, e.second, e.event_index),
     )
-    for current, following in zip(in_play, in_play[1:]):
+    for current, following in pairwise(in_play):
         if following.period != current.period:
             continue  # don't count half-time or the break before extra time
         gap = (following.minute * 60 + following.second) - (current.minute * 60 + current.second)

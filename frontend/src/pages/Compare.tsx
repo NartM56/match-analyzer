@@ -154,20 +154,25 @@ export function Compare() {
     return () => controller.abort();
   }, []);
 
-  const seasonValue = seasons?.some((s) => s.value === params.get("season")) ? params.get("season")! : seasons?.[0]?.value ?? null;
+  // Every choice starts empty; one only counts when it's in the URL and still valid
+  // (so a shared link opens straight to its comparison).
+  const seasonValue = seasons?.some((s) => s.value === params.get("season")) ? params.get("season")! : null;
 
   // 2. that season's matches (for the team list and the match dropdowns)
   useEffect(() => {
     if (!seasonValue) return;
     const [compId, seasonId] = seasonValue.split("-");
     const controller = new AbortController();
-    setMatches(null);
     getJson<Match[]>(`/api/competitions/${compId}/seasons/${seasonId}/matches`, controller.signal)
       .then(setMatches)
       .catch((err) => {
         if (!isAbort(err)) setError("Couldn't load the matches for this season.");
       });
-    return () => controller.abort();
+    // clear this season's matches when the season changes or is cleared
+    return () => {
+      controller.abort();
+      setMatches(null);
+    };
   }, [seasonValue]);
 
   // teams in the season, A–Z
@@ -180,9 +185,7 @@ export function Compare() {
     return [...byId].map(([id, name]) => ({ id, name })).sort((x, y) => x.name.localeCompare(y.name));
   }, [matches]);
 
-  // the choices: from the URL when valid, otherwise sensible defaults
-  // (first team A–Z, Match A = their latest match, Match B = the one before)
-  const teamId = teams.some((t) => t.id === Number(params.get("team"))) ? Number(params.get("team")) : teams[0]?.id ?? null;
+  const teamId = teams.some((t) => t.id === Number(params.get("team"))) ? Number(params.get("team")) : null;
   const teamMatches = useMemo(
     () => (matches ?? []).filter((m) => m.home_team_id === teamId || m.away_team_id === teamId),
     [matches, teamId],
@@ -190,8 +193,9 @@ export function Compare() {
   const ids = teamMatches.map((m) => m.id);
   const aParam = Number(params.get("a"));
   const bParam = Number(params.get("b"));
-  const aId = ids.includes(aParam) ? aParam : ids[ids.length - 1] ?? null;
-  const bId = ids.includes(bParam) && bParam !== aId ? bParam : ids.filter((id) => id !== aId).at(-1) ?? null;
+  const aId = ids.includes(aParam) ? aParam : null;
+  const bId = ids.includes(bParam) && bParam !== aId ? bParam : null;
+  const ready = teamId !== null && aId !== null && bId !== null;
 
   const choose = (next: Partial<Record<"season" | "team" | "a" | "b", string | number | null>>) => {
     const merged = { season: seasonValue, team: teamId, a: aId, b: bId, ...next };
@@ -204,14 +208,17 @@ export function Compare() {
   useEffect(() => {
     if (!teamId || !aId || !bId || aId === bId) return;
     const controller = new AbortController();
-    setComparison(null);
-    setError(null);
     getJson<Comparison>(`/api/compare?team=${teamId}&a=${aId}&b=${bId}`, controller.signal)
       .then(setComparison)
       .catch((err) => {
         if (!isAbort(err)) setError(err instanceof Error ? err.message : "Couldn't load the comparison.");
       });
-    return () => controller.abort();
+    // clear this comparison (and its error) when any of the choices change
+    return () => {
+      controller.abort();
+      setComparison(null);
+      setError(null);
+    };
   }, [teamId, aId, bId]);
 
   const notEnoughMatches = matches !== null && teamId !== null && teamMatches.length < 2;
@@ -235,6 +242,9 @@ export function Compare() {
                 onChange={(e) => choose({ season: e.target.value, team: null, a: null, b: null })}
                 disabled={!seasons}
               >
+                <option value="" disabled>
+                  {seasons ? "Choose a competition" : "Loading…"}
+                </option>
                 {(seasons ?? []).map((s) => (
                   <option key={s.value} value={s.value}>
                     {s.label}
@@ -250,6 +260,9 @@ export function Compare() {
                 onChange={(e) => choose({ team: e.target.value, a: null, b: null })}
                 disabled={!teams.length}
               >
+                <option value="" disabled>
+                  {seasonValue && !matches ? "Loading…" : "Choose a team"}
+                </option>
                 {teams.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -264,6 +277,9 @@ export function Compare() {
                 <span className="cp-letter cp-letter--a">A</span>Match A
               </span>
               <select className="input" value={aId ?? ""} onChange={(e) => choose({ a: e.target.value })} disabled={!teamMatches.length}>
+                <option value="" disabled>
+                  Choose a match
+                </option>
                 {teamMatches.map((m) => (
                   <option key={m.id} value={m.id} disabled={m.id === bId}>
                     {matchLabel(m, teamId!)}
@@ -291,6 +307,9 @@ export function Compare() {
                 <span className="cp-letter cp-letter--b">B</span>Match B
               </span>
               <select className="input" value={bId ?? ""} onChange={(e) => choose({ b: e.target.value })} disabled={!teamMatches.length}>
+                <option value="" disabled>
+                  Choose a match
+                </option>
                 {teamMatches.map((m) => (
                   <option key={m.id} value={m.id} disabled={m.id === aId}>
                     {matchLabel(m, teamId!)}
@@ -307,6 +326,19 @@ export function Compare() {
           </p>
         ) : notEnoughMatches ? (
           <p className="cp-message">This team has only one match in this season, so there's nothing to compare it with.</p>
+        ) : !ready ? (
+          <div className="cp-empty">
+            <h3>{!seasonValue ? "Choose a competition" : !teamId ? "Choose a team" : "Choose two matches"}</h3>
+            <p>
+              {!seasonValue
+                ? "Start with a competition and season, then pick a team and two of their matches."
+                : !teamId
+                  ? "Pick the team whose matches you want to compare."
+                  : aId === null && bId === null
+                    ? "Pick Match A and Match B to see which performance was better."
+                    : `Now pick Match ${aId === null ? "A" : "B"}.`}
+            </p>
+          </div>
         ) : !comparison ? (
           <div className="cp-loading" aria-busy="true" aria-label="Loading comparison">
             <div className="cp-cards">

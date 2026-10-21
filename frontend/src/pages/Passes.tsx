@@ -70,9 +70,6 @@ export function Passes() {
         if (!response.ok) throw new Error(`Failed to load ${path} (${response.status})`);
         return response.json();
       });
-    setPasses(null);
-    setLineups(null);
-    setFailed(false);
     Promise.all([load("passes"), load("lineups")])
       .then(([passData, lineupData]) => {
         setPasses(passData);
@@ -82,7 +79,13 @@ export function Passes() {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setPasses(null);
+      setLineups(null);
+      setFailed(false);
+    };
   }, [match.id]);
 
   if (failed) {

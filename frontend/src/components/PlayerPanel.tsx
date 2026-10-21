@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { MatchDetail, PlayerMatch, PlayerPassPoint, PlayerRank, PlayerShotPoint } from "../types/api";
 import { useMediaQuery } from "../hooks/useMediaQuery";
-import { FullPitch, HalfPitchShots, KIND_LABEL, ShotIcon, shotKind, type Side } from "./ShotMap";
+import { FullPitch, HalfPitchShots, ShotIcon, type Side } from "./ShotMap";
+import { KIND_LABEL, shotKind } from "./shotKind";
 import "./PlayerPanel.css";
 
 /* The player panel: a drawer that opens over the page when a player is clicked
@@ -157,8 +158,6 @@ export function PlayerPanel({ match, playerId, onClose }: Props) {
   // load this player's match
   useEffect(() => {
     const controller = new AbortController();
-    setData(null);
-    setFailed(false);
     fetch(`/api/matches/${match.id}/players/${playerId}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`Failed to load player (${response.status})`);
@@ -168,7 +167,12 @@ export function PlayerPanel({ match, playerId, onClose }: Props) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         setFailed(true);
       });
-    return () => controller.abort();
+    // clear this match's data when moving to another
+    return () => {
+      controller.abort();
+      setData(null);
+      setFailed(false);
+    };
   }, [match.id, playerId]);
 
   // while open: Escape closes, the page behind doesn't scroll, and focus moves into the panel
