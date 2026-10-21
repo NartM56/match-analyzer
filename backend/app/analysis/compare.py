@@ -7,6 +7,7 @@ and per_90 puts two matches of different lengths on the same footing.
 """
 
 import json
+from decimal import ROUND_HALF_UP, Decimal
 from functools import lru_cache
 from pathlib import Path
 
@@ -195,6 +196,13 @@ def scale(value: float, low: float, high: float, lower_is_better: bool = False) 
     return max(0.0, min(1.0, fraction))
 
 
+def round_half_up(value: float) -> int:
+    """Nearest whole number, with .5 always going up (84.5 -> 85). Python's round() sends .5 to the
+    even number (84.5 -> 84). The parts are already to one decimal, so the sum is first tidied to
+    one decimal: adding floats can turn 84.5 into 84.49999..."""
+    return int(Decimal(str(round(value, 1))).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
 def performance_score(summary: dict, stats_90: dict) -> dict:
     """The PlayIQ performance score for one team in one match: the total out of 100, the points
     in each part (for the breakdown on the Compare page) and a band ("Strong", "Average", ...).
@@ -214,7 +222,7 @@ def performance_score(summary: dict, stats_90: dict) -> dict:
         result_share += SHOOTOUT_WIN_SHARE
     parts.insert(2, {"name": "Result", "points": round(result_share * RESULT_POINTS, 1), "max": RESULT_POINTS})
 
-    total = round(sum(p["points"] for p in parts))
+    total = round_half_up(sum(p["points"] for p in parts))
     band = next(label for floor, label in BANDS if total >= floor)
     return {"total": total, "band": band, "parts": parts}
 
